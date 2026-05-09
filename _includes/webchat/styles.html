@@ -1,0 +1,865 @@
+<style>
+/* ============================================
+   WebChat Side Panel — Air Theme
+
+   Every color resolves through a CSS custom property defined in
+   assets/css/_tokens.scss. Hex fallbacks after the comma preserve the
+   current light-theme appearance even if the token layer fails to load
+   (e.g. a build miss or stylesheet request failure).
+   ============================================ */
+
+/* --- Tag (pull handle) — accent-colored for discoverability --- */
+.wc-tag {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 99990;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 18px 12px;
+  border-radius: 10px 0 0 10px;
+  border: 1px solid var(--color-accent-active);
+  border-right: none;
+  cursor: pointer;
+  box-shadow: -3px 0 16px var(--color-accent-tint-3);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.wc-tag:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-accent-on);
+  box-shadow: -3px 0 18px var(--color-accent-tint-5);
+}
+
+/* One-time-per-session pulse on first appearance (gated by sessionStorage in
+   the JS IIFE — the class is applied once, the animation plays once). */
+.wc-tag.wc-tag--pulse {
+  animation: wc-tag-pulse 2.4s ease-out 1;
+}
+@keyframes wc-tag-pulse {
+  0%   { box-shadow: -3px 0 16px var(--color-accent-tint-3), 0 0 0 0 var(--color-accent-tint-5); }
+  60%  { box-shadow: -3px 0 16px var(--color-accent-tint-3), 0 0 0 14px transparent; }
+  100% { box-shadow: -3px 0 16px var(--color-accent-tint-3), 0 0 0 0 transparent; }
+}
+
+.wc-tag:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring, 0 0 0 2px #fff, 0 0 0 4px #0078d4);
+}
+
+.wc-tag svg { width: 18px; height: 18px; flex-shrink: 0; }
+.wc-tag-label { letter-spacing: 0.04em; }
+
+.wc-tag.wc-tag--hidden {
+  right: -60px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* --- Overlay --- */
+.wc-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg, rgba(15, 27, 45, 0.06));
+  z-index: 99991;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+.wc-overlay.wc-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Panel --- */
+.wc-panel {
+  position: fixed;
+  top: var(--wc-panel-top, 0);
+  right: 0;
+  /* Pin to viewport bottom so the panel never resizes during page scroll —
+     it overlaps the footer when the user scrolls down. */
+  bottom: 0;
+  width: 480px;
+  max-width: 95vw;
+  z-index: 99992;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg, #fff);
+  border-left: 1px solid var(--color-border-strong, #d2d0ce);
+  box-shadow: var(--shadow-panel,
+    -8px 0 40px rgba(0, 0, 0, 0.08),
+    -1px 0 0 rgba(0, 0, 0, 0.04));
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wc-panel.wc-panel--open {
+  transform: translateX(0);
+}
+
+/* Session restore: panel is already open, no slide-in animation */
+html.wc-restore .wc-panel {
+  transform: translateX(0);
+  transition: none;
+}
+html.wc-restore .wc-tag {
+  display: none;
+}
+
+/* --- Panel header --- */
+.wc-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--color-divider, #eae8e6);
+  flex-shrink: 0;
+  background: var(--color-bg, #fff);
+}
+
+.wc-panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wc-panel-header-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,
+    var(--color-accent, #0078d4) 0%,
+    var(--color-accent-active, #005a9e) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px var(--color-accent-tint-3, rgba(0, 120, 212, 0.25));
+}
+
+.wc-panel-header-icon svg {
+  width: 17px;
+  height: 17px;
+  color: var(--color-accent-on, #fff);
+}
+
+.wc-panel-header-title {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-fg, #201f1e);
+  line-height: 1.2;
+}
+
+.wc-panel-header-status {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.68rem;
+  color: var(--color-fg-disabled, #757371);
+  font-weight: 500;
+  margin-top: 1px;
+  letter-spacing: 0.01em;
+}
+
+.wc-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.wc-panel-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-fg-disabled, #757371);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.wc-panel-action:hover {
+  background: var(--color-bg-elevated, #f3f2f1);
+  color: var(--color-fg-strong, #323130);
+}
+
+.wc-panel-action:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring, 0 0 0 2px #fff, 0 0 0 4px #0078d4);
+}
+
+.wc-panel-action svg { width: 16px; height: 16px; }
+
+/* --- WebChat body (transcript) --- */
+.wc-panel-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--color-bg-subtle, #faf9f8);
+}
+
+.wc-panel-body > div { height: 100%; }
+
+/* Loading — hidden, using WebChat's native connectivity status */
+.wc-panel-loading { display: none; }
+
+.wc-panel-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+  color: var(--color-fg-muted, #605e5c);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.84rem;
+}
+
+.wc-panel-error button {
+  background: var(--color-accent, #0078d4);
+  color: var(--color-accent-on, #fff);
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.wc-panel-error button:hover { background: var(--color-accent-hover, #106ebe); }
+
+.wc-panel-error button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring, 0 0 0 2px #fff, 0 0 0 4px #0078d4);
+}
+
+/* ===========================================
+   Typing Indicator
+   =========================================== */
+.wc-typing {
+  flex-shrink: 0;
+  padding: 0 18px;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.wc-typing.wc-typing--visible {
+  height: 32px;
+  padding: 6px 18px;
+  opacity: 1;
+}
+
+.wc-typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wc-typing-dots span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-fg-placeholder, #767472);
+  animation: wc-dot-pulse 1.4s ease-in-out infinite;
+}
+
+.wc-typing-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.wc-typing-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes wc-dot-pulse {
+  0%, 60%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  30% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* ===========================================
+   Quick Replies (suggested actions)
+   Rendered by script.html from activity.suggestedActions, instead of
+   relying on Web Chat's built-in <SuggestedActions> inside <BasicSendBox>.
+   =========================================== */
+.wc-quickreplies {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 18px 4px;
+  background: var(--color-bg-subtle, #faf9f8);
+}
+
+.wc-quickreplies[hidden] {
+  display: none !important;
+}
+
+.wc-quickreply {
+  background: var(--color-bg, #fff);
+  border: 1px solid var(--color-accent, #0078d4);
+  color: var(--color-accent, #0078d4);
+  border-radius: 100px;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.wc-quickreply:hover {
+  background: var(--color-accent, #0078d4);
+  color: var(--color-accent-on, #fff);
+}
+
+.wc-quickreply:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring, 0 0 0 2px #fff, 0 0 0 4px #0078d4);
+}
+
+/* ===========================================
+   Custom Send Box
+   Refined pill input with polished send button
+   =========================================== */
+.wc-sendbox {
+  flex-shrink: 0;
+  padding: 12px 16px 16px;
+  background: var(--color-bg, #fff);
+  border-top: 1px solid var(--color-divider, #eae8e6);
+}
+
+.wc-sendbox-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  background: var(--color-bg-input, #f0efed);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 8px 8px 18px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus state is owned by the wrapper so the focus ring encloses the whole
+   pill (input + send button). Visible for both mouse and keyboard users. */
+.wc-sendbox-inner:focus-within {
+  background: var(--color-bg-input-hover, #eae9e7);
+  box-shadow: 0 0 0 2px var(--color-accent-tint-2, rgba(0, 120, 212, 0.25)),
+              0 0 0 4px var(--color-accent, #0078d4);
+}
+
+.wc-sendbox-input,
+.wc-sendbox-input[type="text"],
+textarea.wc-sendbox-input {
+  flex: 1;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  /* No outline on the inner input — the focus ring lives on
+     .wc-sendbox-inner:focus-within above. Keyboard users still see a visible
+     indicator because the wrapper's focus-within triggers on input focus. */
+  outline: none !important;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  color: var(--color-fg, #201f1e);
+  padding: 4px 0 !important;
+  margin: 0 !important;
+  line-height: 1.45;
+  min-width: 0;
+  min-height: 44px;
+  max-height: 160px;
+  resize: none !important;
+  overflow-y: auto;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.wc-sendbox-input::placeholder {
+  color: var(--color-fg-placeholder, #767472);
+  font-weight: 400;
+}
+
+.wc-sendbox-btn {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg,
+    var(--color-accent, #0078d4) 0%,
+    var(--color-accent-active, #005a9e) 100%);
+  color: var(--color-accent-on, #fff);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-send, 0 2px 6px rgba(0, 120, 212, 0.30));
+}
+
+.wc-sendbox-btn:hover {
+  background: linear-gradient(135deg,
+    var(--color-accent-hover, #106ebe) 0%,
+    var(--color-accent-deep, #004578) 100%);
+  box-shadow: var(--shadow-send-hover, 0 3px 10px rgba(0, 120, 212, 0.35));
+  transform: translateY(-1px);
+}
+
+.wc-sendbox-btn:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: var(--shadow-send-active, 0 1px 3px rgba(0, 120, 212, 0.25));
+}
+
+.wc-sendbox-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring, 0 0 0 2px #fff, 0 0 0 4px #0078d4);
+}
+
+.wc-sendbox-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.wc-sendbox-btn svg {
+  width: 16px;
+  height: 16px;
+  margin-left: 1px; /* optical centering for send arrow */
+}
+
+/* Hint text below sendbox */
+.wc-sendbox-hint {
+  text-align: center;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.66rem;
+  color: var(--color-fg-hint, #605e5c);
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+}
+
+/* ===================================
+   WebChat Transcript Overrides
+   =================================== */
+
+.wc-panel-body .webchat__basic-transcript {
+  background: var(--color-bg-subtle, #faf9f8) !important;
+}
+
+/* Bot bubble */
+.wc-panel-body .webchat__bubble:not(.webchat__bubble--from-user) .webchat__bubble__content {
+  background: var(--bubble-bot-bg, rgba(0, 0, 0, 0.04)) !important;
+  border: none !important;
+  border-radius: 14px 14px 14px 4px !important;
+  color: var(--color-fg-body, #3b3a39) !important;
+}
+
+/* User bubble */
+.wc-panel-body .webchat__bubble--from-user .webchat__bubble__content {
+  background: var(--color-user-bubble-bg, rgba(0, 120, 212, 0.08)) !important;
+  border: none !important;
+  border-radius: 14px 14px 4px 14px !important;
+  color: var(--color-user-bubble-fg, #1a3a5c) !important;
+}
+
+/* Links */
+.wc-panel-body .webchat__bubble:not(.webchat__bubble--from-user) a,
+.wc-panel-body .webchat__bubble--from-user a {
+  color: var(--color-accent, #0078d4) !important;
+}
+
+/* Suggested actions */
+.wc-panel-body .webchat__suggested-action__button {
+  background: var(--color-bg, #fff) !important;
+  border: 1px solid var(--color-accent, #0078d4) !important;
+  color: var(--color-accent, #0078d4) !important;
+  border-radius: 100px !important;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  padding: 6px 16px !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer !important;
+}
+
+.wc-panel-body .webchat__suggested-action__button:hover {
+  background: var(--color-accent, #0078d4) !important;
+  color: var(--color-accent-on, #fff) !important;
+}
+
+/* Hide default typing indicator — we use our own */
+.wc-panel-body .webchat__typing-indicator {
+  display: none !important;
+}
+
+/* Hide default send box — we use our own */
+.wc-panel-body .webchat__send-box {
+  display: none !important;
+}
+
+/* Message text — set base on the transcript container so every child
+   inherits via rem and follows the --font-scale root multiplier. Explicit
+   overrides on known WebChat text classes keep the cascade predictable
+   against WebChat's own emotion-injected rules. */
+.wc-panel-body .webchat__basic-transcript,
+.wc-panel-body .webchat__basic-transcript * {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+.wc-panel-body .webchat__basic-transcript {
+  font-size: 0.95rem !important;
+}
+
+.wc-panel-body .webchat__text-content,
+.wc-panel-body .webchat__text-content p,
+.wc-panel-body .webchat__render-markdown,
+.wc-panel-body .webchat__render-markdown p,
+.wc-panel-body .webchat__render-markdown li,
+.wc-panel-body .webchat__bubble__content,
+.wc-panel-body .webchat__bubble__content p,
+.wc-panel-body .webchat__bubble__content li {
+  font-size: 0.95rem !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  color: inherit !important;
+}
+
+/* Timestamp */
+.wc-panel-body .webchat__stacked-layout__status {
+  font-size: 0.75rem !important;
+  color: var(--color-fg-placeholder, #767472) !important;
+}
+
+/* Scrollbar */
+.wc-panel-body ::-webkit-scrollbar { width: 5px; }
+.wc-panel-body ::-webkit-scrollbar-track { background: transparent; }
+.wc-panel-body ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb, #d2d0ce); border-radius: 3px; }
+
+/* ===================================
+   Adaptive Cards — Air Theme
+   =================================== */
+
+.wc-panel-body a.ac-anchor,
+.wc-panel-body a.ac-anchor:link,
+.wc-panel-body a.ac-anchor:visited {
+  color: var(--color-accent, #0078d4) !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wc-panel-body a.ac-anchor:hover { color: var(--color-accent-hover, #106ebe) !important; }
+
+.wc-panel-body .ac-pushButton {
+  background: var(--color-bg, #fff) !important;
+  color: var(--color-fg-strong, #323130) !important;
+  border: 1px solid var(--color-border, #e1dfdd) !important;
+  border-radius: 8px !important;
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.wc-panel-body .ac-pushButton:hover {
+  background: var(--color-bg-elevated, #f3f2f1) !important;
+  border-color: var(--color-border-strong, #d2d0ce) !important;
+}
+
+.wc-panel-body .ac-pushButton.style-positive { color: var(--color-success, #0e700e) !important; border-color: var(--color-success-border, #a7e3a5) !important; }
+.wc-panel-body .ac-pushButton.style-destructive { color: var(--color-danger, #c4314b) !important; border-color: var(--color-danger-border, #f1bbbc) !important; }
+
+.wc-panel-body .ac-input {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-size: 13px !important;
+  color: var(--color-fg-strong, #323130) !important;
+  /* Use the elevated surface so inputs stand off from the bot bubble's bg
+     in dark mode (bg-elevated is lighter than bg, even inside the tint). */
+  background: var(--color-bg-elevated, #f3f2f1) !important;
+  border: 1px solid var(--color-border-strong, #d2d0ce) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+}
+
+.wc-panel-body .ac-input::placeholder {
+  color: var(--color-fg-placeholder, #767472) !important;
+}
+
+.wc-panel-body .ac-input:focus {
+  outline: none;
+  border-color: var(--color-accent, #0078d4) !important;
+  box-shadow: 0 0 0 2px var(--color-accent-tint-2, rgba(0,120,212,0.25)) !important;
+}
+
+/* Force a visible label color in every palette. Adaptive Cards SDK writes
+   an inline `color: rgb(…)` on every .ac-textRun / .ac-textBlock based on
+   its HostConfig (locked to Light values at render time). Override with
+   !important so dark/HC labels are readable. The companion HostConfig
+   injected via styleOptions (see script.html) preserves semantic colors
+   (accent, attention, good, warning) via distinct CSS overrides below. */
+.wc-panel-body .ac-textBlock,
+.wc-panel-body .ac-textBlock span,
+.wc-panel-body .ac-textBlock p,
+.wc-panel-body .ac-richTextBlock,
+.wc-panel-body .ac-richTextBlock .ac-textRun,
+.wc-panel-body .ac-textRun,
+.wc-panel-body .ac-container .ac-textRun {
+  line-height: 1.45;
+  color: var(--color-fg-strong, #201f1e) !important;
+}
+
+/* Keep semantic color runs readable: if Adaptive Cards emits an inline
+   color near the red "attention" spectrum, map to --color-danger so it
+   stays visible against dark bg. Using attribute-prefix matches the SDK's
+   default HostConfig value (#D13438). */
+.wc-panel-body .ac-textRun[style*="rgb(209, 52, 56)"],
+.wc-panel-body .ac-textRun[style*="#D13438"],
+.wc-panel-body .ac-textRun[style*="#d13438"] {
+  color: var(--color-danger, #c4314b) !important;
+}
+
+.wc-panel-body .ac-image { border-radius: 8px; }
+.wc-panel-body .ac-actionSet { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Adaptive Card tiles (topic starters, quick-action cards) ship with an
+   inline `background-color` baked into the card JSON — almost always a
+   near-white (#F9F9F9 / #F0F0F0) tone. In dark / HC we repaint those inner
+   containers with theme-correct surface tokens; otherwise our .ac-textBlock
+   rule (which forces --color-fg-strong onto every label) leaves white text
+   on a white tile — the bug seen in the initial greeting card. Inline style
+   attributes set without !important lose to our !important overrides. */
+[data-theme="dark"] .wc-panel-body .ac-container[style*="background-color"] {
+  background-color: var(--color-bg-elevated, #2b2a29) !important;
+}
+[data-theme="hc"] .wc-panel-body .ac-container[style*="background-color"] {
+  background-color: var(--color-bg-elevated, #000) !important;
+  outline: 1px solid var(--color-fg-strong, #fff);
+  outline-offset: -1px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .wc-panel-body .ac-container[style*="background-color"],
+  [data-theme="system"] .wc-panel-body .ac-container[style*="background-color"] {
+    background-color: var(--color-bg-elevated, #2b2a29) !important;
+  }
+}
+
+/* Tile icons are typically inline-data SVGs with fill="#212121" (dark on
+   light). When we flip the tile to a dark surface above, those icons become
+   invisible. Flip to pure white via filter. Scoped to ac-images inside a
+   tile so the colorful bot avatar / hero images elsewhere stay untouched. */
+[data-theme="dark"] .wc-panel-body .ac-container[style*="background-color"] img.ac-image,
+[data-theme="hc"] .wc-panel-body .ac-container[style*="background-color"] img.ac-image {
+  filter: brightness(0) invert(1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .wc-panel-body .ac-container[style*="background-color"] img.ac-image,
+  [data-theme="system"] .wc-panel-body .ac-container[style*="background-color"] img.ac-image {
+    filter: brightness(0) invert(1);
+  }
+}
+
+/* ===================================
+   Responsive
+   =================================== */
+@media (max-width: 480px) {
+  /* .wc-tag and .wc-panel stay visible on mobile — the assistant is now
+     reachable from phones too. .wc-overlay is removed from the DOM by JS,
+     so the rule below is just a safety belt. */
+  .wc-overlay { display: none; }
+}
+
+/* ===================================
+   Nudge balloon
+   ===================================
+   First-visit-per-session speech bubble next to the chat tag, introducing
+   what the assistant can help with. Theme-aware via accent tokens. */
+.wc-nudge {
+  position: fixed;
+  right: 56px;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 320px;
+  z-index: 99989;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  border: 1px solid var(--color-accent-active);
+  border-radius: 14px;
+  box-shadow: 0 12px 36px var(--color-accent-tint-5);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  animation: wc-nudge-in 0.45s ease-out 0.6s both;
+}
+.wc-nudge[hidden] { display: none; }
+.wc-nudge::after {
+  /* Speech-bubble pointer toward the tag */
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  transform: translateY(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border-right: 1px solid var(--color-accent-active);
+  border-top: 1px solid var(--color-accent-active);
+}
+@keyframes wc-nudge-in {
+  from { opacity: 0; transform: translateY(-50%) translateX(8px); }
+  to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+.wc-nudge-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 10px 14px 16px;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  flex: 1;
+  border-radius: 13px 0 0 13px;
+}
+.wc-nudge-body:hover { background: var(--color-accent-hover); }
+.wc-nudge-body:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.wc-nudge-emoji { font-size: 22px; flex-shrink: 0; }
+.wc-nudge-text { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
+.wc-nudge-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid color-mix(in srgb, var(--color-accent-on) 25%, transparent);
+  color: color-mix(in srgb, var(--color-accent-on) 85%, transparent);
+  cursor: pointer;
+  border-radius: 0 13px 13px 0;
+}
+.wc-nudge-close:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-accent-on);
+}
+.wc-nudge-close svg { width: 16px; height: 16px; flex-shrink: 0; }
+.wc-nudge.wc-nudge--dismissed { display: none !important; }
+
+@media (max-width: 480px) {
+  /* Mobile: anchor the nudge above the bottom-right edge instead of mid-height.
+     The tag is still on the right edge mid-screen at this size. */
+  .wc-nudge {
+    top: auto;
+    bottom: 80px;
+    right: 12px;
+    left: auto;
+    transform: none;
+    max-width: calc(100vw - 24px);
+  }
+  .wc-nudge::after { display: none; }
+  @keyframes wc-nudge-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ===================================
+   Account CTA buttons (masthead + home hero)
+   ===================================
+   The masthead pill and the home-hero "Request an account" button. Both
+   open the chat panel via a click handler in script.html. */
+.wc-account-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+/* Hero CTA: distinct success-green to stand out from the existing two
+   blue/outline buttons in .home-hero-actions. */
+.wc-account-cta--hero {
+  font-size: 0.88em;
+  padding: 0.6em 1.4em;
+  border-radius: 6px;
+  background: var(--color-success);
+  color: var(--color-on-success);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+.wc-account-cta--hero:hover {
+  background: var(--color-success-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+.wc-account-cta--hero svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* Masthead CTA: small accent-colored pill, sits in the nav. */
+.wc-account-cta--masthead {
+  margin-left: auto;
+  margin-right: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  font-size: 0.78rem;
+}
+.wc-account-cta--masthead:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-accent-on);
+}
+.wc-account-cta--masthead svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+@media (max-width: 480px) {
+  /* Hero CTA goes full-width so the longer copy doesn't wrap awkwardly. */
+  .wc-account-cta--hero {
+    width: 100%;
+    justify-content: center;
+  }
+  /* Masthead CTA is hidden on mobile to save space — the chat tag remains
+     reachable from any page. */
+  .wc-account-cta--masthead { display: none; }
+}
+</style>

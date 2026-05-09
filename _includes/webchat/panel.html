@@ -1,0 +1,112 @@
+<script>
+// Runs before the panel div is styled; sets html.wc-restore so CSS paints
+// the panel already open (no slide-in) when a session is being resumed.
+(function () {
+  try {
+    var raw = sessionStorage.getItem('mcs-labs.webchat.v1');
+    if (!raw) return;
+    var s = JSON.parse(raw);
+    if (s && s.schemaVersion === 1 && s.tokenExpiresAt > Date.now() && s.isOpen) {
+      document.documentElement.classList.add('wc-restore');
+      document.documentElement.setAttribute('data-panel-open', '');
+    }
+  } catch (e) {}
+})();
+</script>
+
+<!-- Chat tag (pull handle). Native <button> — gets free keyboard handling
+     and focus semantics without the manual Enter/Space listener. -->
+<button type="button" class="wc-tag" id="wcTag" aria-label="Open Lab Assistant chat" aria-expanded="false" aria-controls="wcPanel">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <span class="wc-tag-label">Lab Assistant</span>
+</button>
+
+<!-- Nudge balloon: a one-time-per-session speech bubble next to the chat tag,
+     introducing what the assistant can help with. The script.html IIFE
+     reveals it (removes [hidden]) on first session-load and dismisses it on
+     × click, body click, or sessionStorage flag (set after dismissal). -->
+<div class="wc-nudge" id="wcNudge" role="region" aria-label="Lab Assistant suggestion" hidden>
+  <button type="button" class="wc-nudge-body" id="wcNudgeBody" aria-label="Open Lab Assistant">
+    <span class="wc-nudge-emoji" aria-hidden="true">👋</span>
+    <span class="wc-nudge-text">Hi! I can help you get your account, find labs, or troubleshoot setup.</span>
+  </button>
+  <button type="button" class="wc-nudge-close" id="wcNudgeClose" aria-label="Dismiss suggestion">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Overlay (script strips this from the DOM on init; see script.html:176) -->
+<div class="wc-overlay" id="wcOverlay" aria-hidden="true"></div>
+
+<!-- Chat panel -->
+<div class="wc-panel" id="wcPanel" role="dialog" aria-modal="false" aria-labelledby="wcPanelTitle" aria-hidden="true">
+  <!-- Header -->
+  <div class="wc-panel-header">
+    <div class="wc-panel-header-left">
+      <div class="wc-panel-header-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="wc-panel-header-title" id="wcPanelTitle">{{ site.data.webchat.botName | default: "Lab Assistant" }}</div>
+        <div class="wc-panel-header-status" id="wcStatus" aria-live="polite">Ready</div>
+      </div>
+    </div>
+    <div class="wc-panel-header-actions">
+      <button type="button" class="wc-panel-action" id="wcReset" aria-label="New conversation" title="New conversation">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <rect x="4" y="4" width="16" height="16" rx="3" ry="3"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+      </button>
+      <button type="button" class="wc-panel-action wc-panel-close" id="wcClose" aria-label="Close Lab Assistant">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body (WebChat renders here — transcript only, no sendbox) -->
+  <div class="wc-panel-body" id="wcBody">
+    <div class="wc-panel-loading" id="wcLoading" style="display: none;"></div>
+    <div class="wc-panel-error" id="wcError" style="display: none;" aria-live="assertive">
+      <span>Could not connect to the assistant.</span>
+      <button type="button" id="wcRetry">Try again</button>
+    </div>
+  </div>
+
+  <!-- Typing indicator -->
+  <div class="wc-typing" id="wcTyping" aria-hidden="true">
+    <div class="wc-typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Quick replies (suggested actions). Rendered by script.html when an
+       incoming bot activity carries activity.suggestedActions.actions. We
+       build our own buttons here instead of letting Web Chat render its
+       built-in <SuggestedActions> inside <BasicSendBox>, because hiding
+       that subtree was the source of the duplicate-send-box bug. -->
+  <div class="wc-quickreplies" id="wcQuickReplies" role="group" aria-label="Quick replies" hidden></div>
+
+  <!-- Custom send box -->
+  <div class="wc-sendbox">
+    <label for="wcSendInput" class="visually-hidden">Message Lab Assistant</label>
+    <div class="wc-sendbox-inner">
+      <textarea id="wcSendInput" class="wc-sendbox-input" placeholder="Ask about labs, setup, or workshops..." rows="2" autocomplete="off"></textarea>
+      <button type="button" id="wcSendBtn" class="wc-sendbox-btn" aria-label="Send message">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+    <div class="wc-sendbox-hint">Powered by Microsoft Copilot Studio</div>
+  </div>
+</div>

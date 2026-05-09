@@ -1,0 +1,731 @@
+<script src="https://cdn.botframework.com/botframework-webchat/4.18.0/webchat.js" defer></script>
+<script>
+(function () {
+  'use strict';
+
+  // --- Discoverability: pulse + nudge + account CTA ---
+  // First-visit-per-session affordances that draw attention to the assistant
+  // without nagging returning visitors. State is held in sessionStorage so
+  // a fresh tab gets the introduction once, and only once.
+  var TAG_PULSE_KEY = 'mcs-labs.assistant-pulse.v1';
+  var NUDGE_KEY     = 'mcs-labs.assistant-nudge.v1';
+
+  // Pulse the chat tag once per session (purely visual; no DOM consequences).
+  document.addEventListener('DOMContentLoaded', function () {
+    try {
+      if (sessionStorage.getItem(TAG_PULSE_KEY)) return;
+      var t = document.getElementById('wcTag');
+      if (!t) return;
+      t.classList.add('wc-tag--pulse');
+      sessionStorage.setItem(TAG_PULSE_KEY, '1');
+    } catch (e) { /* sessionStorage disabled — quietly skip */ }
+  });
+
+  // Reveal + wire up the nudge balloon once per session. Dismissed via × click,
+  // body click (which also opens the chat), or sessionStorage flag from a
+  // prior visit in the same tab.
+  document.addEventListener('DOMContentLoaded', function () {
+    var nudge = document.getElementById('wcNudge');
+    if (!nudge) return;
+    try {
+      if (sessionStorage.getItem(NUDGE_KEY)) return;
+    } catch (e) { /* fall through and show */ }
+    var nudgeBody  = document.getElementById('wcNudgeBody');
+    var nudgeClose = document.getElementById('wcNudgeClose');
+    nudge.removeAttribute('hidden');
+    function dismiss() {
+      nudge.classList.add('wc-nudge--dismissed');
+      try { sessionStorage.setItem(NUDGE_KEY, '1'); } catch (e) {}
+    }
+    if (nudgeClose) nudgeClose.addEventListener('click', function (e) {
+      e.stopPropagation();
+      dismiss();
+    });
+    if (nudgeBody) nudgeBody.addEventListener('click', function () {
+      dismiss();
+      var t = document.getElementById('wcTag');
+      if (t) t.click();
+    });
+    // Discovering the assistant via the tag itself (or any code path that
+    // triggers the tag click — including the account CTAs) is equivalent
+    // to dismissing the nudge: the user has now found the assistant, so
+    // the introductory tip is no longer useful.
+    var tag = document.getElementById('wcTag');
+    if (tag) tag.addEventListener('click', dismiss);
+  });
+
+  // Account-request CTA buttons (masthead pill + home-hero button). Clicking
+  // either just opens the chat panel — the bot greets normally and the user
+  // types their own request.
+  document.addEventListener('DOMContentLoaded', function () {
+    var ctas = document.querySelectorAll('[data-wc-account-cta]');
+    Array.prototype.forEach.call(ctas, function (btn) {
+      btn.addEventListener('click', function () {
+        var t = document.getElementById('wcTag');
+        if (t) t.click();
+      });
+    });
+  });
+
+  var TOKEN_ENDPOINT = {{ site.data.webchat.tokenEndpoint | jsonify }};
+
+  // Move elements to document.body to escape ancestor stacking contexts
+  ['wcTag', 'wcOverlay', 'wcPanel', 'wcNudge'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el && el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // DOM refs
+  var tag = document.getElementById('wcTag');
+  var overlay = document.getElementById('wcOverlay');
+  var panel = document.getElementById('wcPanel');
+  var closeBtn = document.getElementById('wcClose');
+  var resetBtn = document.getElementById('wcReset');
+  var body = document.getElementById('wcBody');
+  var loading = document.getElementById('wcLoading');
+  var error = document.getElementById('wcError');
+  var retryBtn = document.getElementById('wcRetry');
+  var status = document.getElementById('wcStatus');
+  var sendInput = document.getElementById('wcSendInput');
+  var sendBtn = document.getElementById('wcSendBtn');
+  var quickRepliesEl = document.getElementById('wcQuickReplies');
+
+  var isOpen = false;
+  var chatInitializing = false;
+  var chatReady = false;
+  var chatStore = null;
+
+  // --- Session persistence (per-tab, not a cookie) ---
+
+  var STORAGE_KEY = 'mcs-labs.webchat.v1';
+  var STORAGE_SCHEMA_VERSION = 1;
+  var ACTIVITY_CAP = 50;
+  var TOKEN_FALLBACK_LIFETIME_MS = 55 * 60 * 1000;
+  var TOKEN_SAFETY_BUFFER_MS = 60 * 1000;
+
+  var persistedState = null;
+  var recentActivities = [];
+  var lastWatermark = null;
+  var currentToken = null;
+  var currentTokenExpiresAt = 0;
+  var persistTimer = null;
+  var replayedActivityIds = null;
+  var fallingBack = false;
+
+  function loadPersistedState() {
+    try {
+      var raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var state = JSON.parse(raw);
+      if (!state || state.schemaVersion !== STORAGE_SCHEMA_VERSION) {
+        clearPersistedState();
+        return null;
+      }
+      if (!state.tokenExpiresAt || state.tokenExpiresAt <= Date.now()) {
+        clearPersistedState();
+        return null;
+      }
+      return state;
+    } catch (e) {
+      clearPersistedState();
+      return null;
+    }
+  }
+
+  function buildStateSnapshot() {
+    return {
+      schemaVersion: STORAGE_SCHEMA_VERSION,
+      token: currentToken,
+      tokenExpiresAt: currentTokenExpiresAt,
+      watermark: lastWatermark,
+      isOpen: isOpen,
+      activities: recentActivities.slice(-ACTIVITY_CAP),
+      savedAt: Date.now()
+    };
+  }
+
+  function persistState() {
+    if (persistTimer) return;
+    persistTimer = setTimeout(function () {
+      persistTimer = null;
+      flushPersistState();
+    }, 200);
+  }
+
+  function flushPersistState() {
+    if (persistTimer) {
+      clearTimeout(persistTimer);
+      persistTimer = null;
+    }
+    if (!currentToken) return;
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildStateSnapshot()));
+    } catch (e) {
+      // Quota or serialization error — keep running in-memory.
+    }
+  }
+
+  function clearPersistedState() {
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  }
+
+  function extractWatermark(activity) {
+    if (!activity || !activity.id) return null;
+    var parts = String(activity.id).split('|');
+    var suffix = parts[parts.length - 1];
+    return /^\d+$/.test(suffix) ? suffix : null;
+  }
+
+  function pushActivity(activity) {
+    if (!activity || !activity.id) return;
+    recentActivities.push(activity);
+    if (recentActivities.length > ACTIVITY_CAP) {
+      recentActivities.splice(0, recentActivities.length - ACTIVITY_CAP);
+    }
+    var wm = extractWatermark(activity);
+    if (wm) lastWatermark = wm;
+    persistState();
+  }
+
+  // --- Masthead offset: keep panel below the (non-sticky) masthead ---
+  // The panel is position: fixed. We nudge its top below the masthead so the
+  // top nav stays reachable while the chat is open. The bottom edge stays
+  // pinned to the viewport bottom (panel overlaps the footer when scrolled),
+  // which avoids resizing the chat surface during page scroll.
+
+  var chromeOffsetFrame = null;
+
+  function applyChromeOffsets() {
+    chromeOffsetFrame = null;
+    var masthead = document.querySelector('.masthead');
+    var topPx = masthead ? Math.max(0, Math.ceil(masthead.getBoundingClientRect().bottom)) : 0;
+    document.documentElement.style.setProperty('--wc-panel-top', topPx + 'px');
+  }
+
+  function scheduleChromeOffsets() {
+    if (chromeOffsetFrame) return;
+    chromeOffsetFrame = requestAnimationFrame(applyChromeOffsets);
+  }
+
+  // Back-compat aliases for earlier variable names used elsewhere in this file.
+  var applyMastheadOffset = applyChromeOffsets;
+  var scheduleMastheadOffset = scheduleChromeOffsets;
+
+  // --- Quick replies (suggested actions) ---
+  // We render our own buttons from activity.suggestedActions instead of
+  // showing Web Chat's built-in <SuggestedActions>, so we don't need
+  // hideSendBox: false (which leaks the input form + connectivity dots).
+
+  function clearQuickReplies() {
+    if (!quickRepliesEl) return;
+    while (quickRepliesEl.firstChild) quickRepliesEl.removeChild(quickRepliesEl.firstChild);
+    quickRepliesEl.hidden = true;
+  }
+
+  function renderQuickReplies(actions) {
+    if (!quickRepliesEl) return;
+    clearQuickReplies();
+    if (!actions || !actions.length) return;
+    actions.forEach(function (action) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'wc-quickreply';
+      btn.textContent = action.title || action.displayText || action.text || action.value || '';
+      btn.addEventListener('click', function () {
+        var t = action.type || 'imBack';
+        if (t === 'openUrl' && action.value) {
+          // Open in a new tab; keep the buttons available so the user can
+          // pick a different one if they came back without picking.
+          window.open(action.value, '_blank', 'noopener,noreferrer');
+          return;
+        }
+        // Pre-clear so a slow round-trip can't double-fire on a second click.
+        clearQuickReplies();
+        if (!chatStore || !chatReady) return;
+        if (t === 'postBack') {
+          chatStore.dispatch({
+            type: 'WEB_CHAT/SEND_POST_BACK',
+            payload: { value: action.value }
+          });
+        } else if (t === 'messageBack') {
+          chatStore.dispatch({
+            type: 'WEB_CHAT/SEND_MESSAGE_BACK',
+            payload: {
+              value: action.value,
+              text: action.text || action.title,
+              displayText: action.displayText || action.title
+            }
+          });
+        } else {
+          // imBack and any default: send as a regular text message so the
+          // bot sees it like a typed user reply.
+          chatStore.dispatch({
+            type: 'WEB_CHAT/SEND_MESSAGE',
+            payload: { text: action.value || action.title }
+          });
+        }
+      });
+      quickRepliesEl.appendChild(btn);
+    });
+    quickRepliesEl.hidden = false;
+  }
+
+  // --- Sendbox disabled state ---
+
+  function setSendboxEnabled(enabled) {
+    sendInput.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+    sendInput.placeholder = enabled
+      ? 'Ask about labs, setup, or workshops...'
+      : 'Connecting...';
+  }
+
+  setSendboxEnabled(false);
+
+  // --- Focus trap ---
+
+  function getFocusableElements() {
+    return panel.querySelectorAll(
+      'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+  }
+
+  function handleFocusTrap(e) {
+    if (e.key !== 'Tab' || !isOpen) return;
+    var focusable = getFocusableElements();
+    if (focusable.length === 0) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+
+  // --- Panel toggle ---
+
+  // Remove overlay — lab assistant should not block page interaction
+  if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+
+  // Start inert — panel is aria-hidden=true initially. `inert` pulls focusable
+  // children out of the tab order so keyboard users don't Tab into the hidden
+  // panel. Toggled in open()/close().
+  panel.inert = true;
+
+  function open() {
+    isOpen = true;
+    panel.classList.add('wc-panel--open');
+    tag.classList.add('wc-tag--hidden');
+    document.documentElement.setAttribute('data-panel-open', '');
+    tag.setAttribute('aria-expanded', 'true');
+    panel.setAttribute('aria-hidden', 'false');
+    panel.inert = false;
+    panel.addEventListener('keydown', handleFocusTrap);
+    if (!chatInitializing && !chatReady) initChat();
+    else if (chatReady) sendInput.focus();
+    persistState();
+  }
+
+  function close() {
+    isOpen = false;
+    panel.classList.remove('wc-panel--open');
+    tag.classList.remove('wc-tag--hidden');
+    document.documentElement.removeAttribute('data-panel-open');
+    tag.setAttribute('aria-expanded', 'false');
+    panel.setAttribute('aria-hidden', 'true');
+    panel.inert = true;
+    panel.removeEventListener('keydown', handleFocusTrap);
+    tag.focus();
+    persistState();
+  }
+
+  tag.addEventListener('click', open);
+  // No manual Enter/Space handler: #wcTag is now a native <button>, which
+  // activates on Enter/Space via the user-agent.
+  closeBtn.addEventListener('click', close);
+
+  // --- Reset conversation ---
+  // Tears down the current token + transcript + watermark, then calls
+  // initChat() with no resumeState so a fresh token is fetched from the
+  // token endpoint. The bot's greeting will fire for the new conversation
+  // because initChat dispatches 'startConversation' when resumeState is
+  // absent. Focus stays on the chat input so the user can type immediately.
+  function resetConversation() {
+    clearPersistedState();
+    currentToken = null;
+    currentTokenExpiresAt = 0;
+    lastWatermark = null;
+    recentActivities = [];
+    replayedActivityIds = null;
+    chatStore = null;
+    chatReady = false;
+    chatInitializing = false;
+    fallingBack = false;
+    clearQuickReplies();
+
+    // Replace the host element entirely so renderWebChat mounts a fresh
+    // React tree. Just clearing innerHTML leaves React's _reactRootContainer
+    // on the element, which causes renderWebChat to do an update rather
+    // than a full remount — the old store/directLine stay wired up and
+    // the bot's fresh-conversation greeting never makes it to the visible
+    // transcript.
+    var parent = body.parentNode;
+    var fresh = body.cloneNode(false);
+    parent.replaceChild(fresh, body);
+    body = fresh;
+
+    status.textContent = 'Connecting...';
+    initChat();
+  }
+
+  resetBtn.addEventListener('click', resetConversation);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) close();
+  });
+
+  // --- Custom send box ---
+
+  function sendMessage() {
+    var text = sendInput.value.trim();
+    if (!text || !chatStore || !chatReady) return;
+    // Typing a new message supersedes any pending quick replies.
+    clearQuickReplies();
+    chatStore.dispatch({
+      type: 'WEB_CHAT/SEND_MESSAGE',
+      payload: { text: text }
+    });
+    sendInput.value = '';
+    autoResize();
+    sendInput.focus();
+  }
+
+  // Textarea auto-resize: grow from the rows=2 baseline up to the CSS
+  // max-height, then scroll internally.
+  function autoResize() {
+    sendInput.style.height = 'auto';
+    sendInput.style.height = Math.min(sendInput.scrollHeight, 160) + 'px';
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  sendInput.addEventListener('input', autoResize);
+  sendInput.addEventListener('keydown', function (e) {
+    // Enter sends; Shift+Enter inserts a newline.
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // --- Chat initialization (lazy, on first open) ---
+
+  function waitForWebChat() {
+    return new Promise(function (resolve) {
+      if (window.WebChat) return resolve();
+      var check = setInterval(function () {
+        if (window.WebChat) { clearInterval(check); resolve(); }
+      }, 100);
+    });
+  }
+
+  async function initChat(resumeState) {
+    if (chatInitializing) return;
+    chatInitializing = true;
+    chatReady = false;
+    loading.style.display = '';
+    error.style.display = 'none';
+    status.textContent = 'Connecting...';
+    setSendboxEnabled(false);
+
+    try {
+      await waitForWebChat();
+
+      var token;
+      if (resumeState && resumeState.token && resumeState.tokenExpiresAt > Date.now()) {
+        token = resumeState.token;
+        currentTokenExpiresAt = resumeState.tokenExpiresAt;
+      } else {
+        var res = await fetch(TOKEN_ENDPOINT);
+        if (!res.ok) throw new Error('Token request failed (' + res.status + ')');
+        var data = await res.json();
+        token = data.token;
+        var lifetimeMs = (typeof data.expires_in === 'number' && data.expires_in > 0)
+          ? (data.expires_in * 1000) - TOKEN_SAFETY_BUFFER_MS
+          : TOKEN_FALLBACK_LIFETIME_MS;
+        currentTokenExpiresAt = Date.now() + lifetimeMs;
+      }
+      currentToken = token;
+
+      var directLineOpts = { token: token };
+      if (resumeState && resumeState.watermark) {
+        directLineOpts.watermark = resumeState.watermark;
+        lastWatermark = resumeState.watermark;
+      }
+      var directLine = window.WebChat.createDirectLine(directLineOpts);
+
+      // Typing indicator state
+      var typingTimer = null;
+      var typingEl = document.getElementById('wcTyping');
+
+      function showTyping() {
+        typingEl.classList.add('wc-typing--visible');
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(function () {
+          typingEl.classList.remove('wc-typing--visible');
+        }, 5000);
+      }
+
+      function hideTyping() {
+        clearTimeout(typingTimer);
+        typingEl.classList.remove('wc-typing--visible');
+      }
+
+      var store = window.WebChat.createStore({}, function () {
+        return function (next) {
+          return function (action) {
+            var result = next(action);
+
+            // Handle post-dispatch side effects (avoids dispatch-in-dispatch)
+            if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
+              status.textContent = 'Online';
+              chatReady = true;
+              setSendboxEnabled(true);
+              sendInput.focus();
+              // Only fire startConversation for brand-new sessions; reconnects
+              // already have the bot's greeting in the cached transcript.
+              if (!resumeState) {
+                setTimeout(function () {
+                  store.dispatch({
+                    type: 'WEB_CHAT/SEND_EVENT',
+                    payload: { name: 'startConversation', type: 'event', value: '' }
+                  });
+                }, 0);
+              }
+              persistState();
+            }
+
+            if (action.type === 'DIRECT_LINE/CONNECT_REJECTED') {
+              status.textContent = 'Disconnected';
+              chatReady = false;
+              setSendboxEnabled(false);
+              if (resumeState && !fallingBack) {
+                fallingBack = true;
+                clearPersistedState();
+                currentToken = null;
+                recentActivities = [];
+                lastWatermark = null;
+                chatInitializing = false;
+                setTimeout(function () { initChat(); }, 0);
+              }
+            }
+
+            if (action.type === 'DIRECT_LINE/DISCONNECT_FULFILLED') {
+              status.textContent = 'Disconnected';
+              chatReady = false;
+              setSendboxEnabled(false);
+            }
+
+            if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
+              var activity = action.payload.activity;
+              if (activity.from && activity.from.role === 'bot') {
+                if (activity.type === 'typing') {
+                  showTyping();
+                } else {
+                  hideTyping();
+                }
+                // Quick replies: render our own buttons from
+                // activity.suggestedActions. A bot message without
+                // suggestedActions clears any stale ones from a prior turn.
+                if (activity.type === 'message') {
+                  var sa = activity.suggestedActions;
+                  if (sa && Array.isArray(sa.actions) && sa.actions.length) {
+                    renderQuickReplies(sa.actions);
+                  } else {
+                    clearQuickReplies();
+                  }
+                }
+              }
+              if (activity.type !== 'typing' && activity.id &&
+                  !(replayedActivityIds && replayedActivityIds.has(activity.id))) {
+                pushActivity(activity);
+              }
+            }
+
+            return result;
+          };
+        };
+      });
+
+      chatStore = store;
+
+      // Resolve token value from CSS at render time so WebChat's internal
+      // styling follows the active theme (data-theme on <html>).
+      var styleRoot = document.documentElement;
+      function tok(name, fallback) {
+        var v = getComputedStyle(styleRoot).getPropertyValue(name).trim();
+        return v || fallback;
+      }
+
+      var styleOptions = {
+        backgroundColor: tok('--color-bg-subtle', '#faf9f8'),
+        rootHeight: '100%',
+        rootWidth: '100%',
+
+        primaryFont: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+
+        botAvatarInitials: '',
+        userAvatarInitials: '',
+        showAvatarInGroup: false,
+        avatarSize: 0,
+
+        bubbleBackground: tok('--bubble-bot-bg', 'rgba(0, 0, 0, 0.04)'),
+        bubbleBorderColor: 'transparent',
+        bubbleBorderRadius: 14,
+        bubbleTextColor: tok('--color-fg-body', '#3b3a39'),
+
+        bubbleFromUserBackground: tok('--color-user-bubble-bg', 'rgba(0, 120, 212, 0.08)'),
+        bubbleFromUserBorderColor: 'transparent',
+        bubbleFromUserBorderRadius: 14,
+        bubbleFromUserTextColor: tok('--color-user-bubble-fg', '#1a3a5c'),
+
+        hideSendBox: true,
+        hideUploadButton: true,
+
+        suggestedActionBackgroundColor: tok('--color-bg', '#ffffff'),
+        suggestedActionBorderColor: tok('--color-accent', '#0078d4'),
+        suggestedActionTextColor: tok('--color-accent', '#0078d4'),
+        suggestedActionBorderRadius: 100,
+        suggestedActionHeight: 32,
+
+        timestampColor: tok('--color-fg-placeholder', '#a19f9d'),
+        groupTimestamp: 30000,
+
+        // Adaptive Cards HostConfig — inline colors the SDK paints into
+        // .ac-textRun/.ac-textBlock come from here. Populate from CSS tokens
+        // so new cards render with the active theme out of the box.
+        adaptiveCardsHostConfig: {
+          fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          containerStyles: {
+            default: {
+              backgroundColor: tok('--bubble-bot-bg', '#00000010'),
+              foregroundColors: {
+                default:   { default: tok('--color-fg-strong', '#201f1e'), subtle: tok('--color-fg-muted', '#605e5c') },
+                dark:      { default: tok('--color-fg-strong', '#201f1e'), subtle: tok('--color-fg-muted', '#605e5c') },
+                light:     { default: tok('--color-fg-strong', '#201f1e'), subtle: tok('--color-fg-muted', '#605e5c') },
+                accent:    { default: tok('--color-accent', '#0078d4'),    subtle: tok('--color-accent-hover', '#106ebe') },
+                good:      { default: tok('--color-success', '#0e700e'),   subtle: tok('--color-success', '#0e700e') },
+                warning:   { default: tok('--color-danger', '#c4314b'),    subtle: tok('--color-danger', '#c4314b') },
+                attention: { default: tok('--color-danger', '#c4314b'),    subtle: tok('--color-danger', '#c4314b') },
+              },
+            },
+            emphasis: {
+              backgroundColor: tok('--color-bg-elevated', '#f3f2f1'),
+              foregroundColors: {
+                default:   { default: tok('--color-fg-strong', '#201f1e'), subtle: tok('--color-fg-muted', '#605e5c') },
+                accent:    { default: tok('--color-accent', '#0078d4'),    subtle: tok('--color-accent-hover', '#106ebe') },
+                attention: { default: tok('--color-danger', '#c4314b'),    subtle: tok('--color-danger', '#c4314b') },
+              },
+            },
+          },
+        },
+      };
+
+      // Clear any prior mount before rendering
+      body.innerHTML = '';
+
+      window.WebChat.renderWebChat(
+        { directLine: directLine, store: store, styleOptions: styleOptions },
+        body
+      );
+
+      // Replay cached transcript so the user sees prior messages immediately.
+      if (resumeState && resumeState.activities && resumeState.activities.length) {
+        replayedActivityIds = new Set();
+        recentActivities = resumeState.activities.slice();
+        for (var i = 0; i < resumeState.activities.length; i++) {
+          var a = resumeState.activities[i];
+          if (!a || !a.id) continue;
+          replayedActivityIds.add(a.id);
+          store.dispatch({
+            type: 'DIRECT_LINE/INCOMING_ACTIVITY',
+            payload: { activity: a }
+          });
+        }
+      }
+
+      loading.style.display = 'none';
+
+    } catch (err) {
+      console.error('WebChat init failed:', err);
+      body.innerHTML = '';
+      loading.style.display = 'none';
+      error.style.display = '';
+      status.textContent = 'Error';
+      chatInitializing = false;
+      chatReady = false;
+      if (resumeState && !fallingBack) {
+        fallingBack = true;
+        clearPersistedState();
+        currentToken = null;
+        recentActivities = [];
+        lastWatermark = null;
+        initChat();
+      }
+    }
+  }
+
+  retryBtn.addEventListener('click', function () {
+    clearPersistedState();
+    currentToken = null;
+    recentActivities = [];
+    lastWatermark = null;
+    if (!chatInitializing) initChat();
+  });
+
+  // --- Restore session state on page load ---
+
+  applyChromeOffsets();
+  window.addEventListener('resize', scheduleChromeOffsets);
+  window.addEventListener('scroll', scheduleChromeOffsets, { passive: true });
+  window.addEventListener('load', applyChromeOffsets);
+
+  window.addEventListener('pagehide', flushPersistState);
+
+  persistedState = loadPersistedState();
+  if (persistedState) {
+    currentToken = persistedState.token;
+    currentTokenExpiresAt = persistedState.tokenExpiresAt;
+    lastWatermark = persistedState.watermark || null;
+    recentActivities = (persistedState.activities || []).slice();
+    if (persistedState.isOpen) {
+      isOpen = true;
+      panel.classList.add('wc-panel--open');
+      tag.classList.add('wc-tag--hidden');
+      document.documentElement.setAttribute('data-panel-open', '');
+      tag.setAttribute('aria-expanded', 'true');
+      panel.setAttribute('aria-hidden', 'false');
+      panel.inert = false;
+      panel.addEventListener('keydown', handleFocusTrap);
+      initChat(persistedState);
+    }
+  }
+
+  // Drop the wc-restore suppressor after the first paint so user-triggered
+  // open/close still animates normally within this page's lifetime.
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.documentElement.classList.remove('wc-restore');
+    });
+  });
+
+  // Note: theme changes do NOT re-initialize the chat. The user's conversation
+  // (token + watermark + transcript) survives theme toggles. Most WebChat
+  // surfaces (transcript bg, bubble bg/fg, links, suggested actions) are
+  // re-skinned at runtime via CSS custom properties in the accompanying
+  // styles.html. The few colors that WebChat bakes into its internal DOM at
+  // init (timestamp text, focus rings on internal controls) will stay at the
+  // theme that was active when the chat first mounted — they refresh on the
+  // next page load.
+})();
+</script>

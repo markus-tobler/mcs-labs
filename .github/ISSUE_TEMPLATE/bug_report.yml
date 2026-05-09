@@ -1,0 +1,39 @@
+name: Bug Report
+description: Report a problem with a lab
+labels: ["type: bug"]
+body:
+  - type: input
+    id: lab
+    attributes:
+      label: Which lab?
+      description: Pre-filled if you clicked "Report an issue" from a lab page
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug you encountered
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: What should have happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Which step in the lab were you on?
+      placeholder: |
+        1. Go to step X
+        2. Follow the instructions
+        3. See error...
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain the problem

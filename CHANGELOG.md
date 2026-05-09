@@ -8,6 +8,120 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- **Lab Assistant discoverability boost.** The right-edge pull tag now paints in the brand accent color (was muted gray on white) and pulses once per session on first appearance — a one-time visual cue that fades away after the user has seen the assistant. A speech-bubble nudge balloon also fades in next to the tag on the first visit per browser session, introducing what the assistant can help with: *"Hi! I can help you get your account, find labs, or troubleshoot setup."* The nudge is dismissable via × or by clicking its body (which also opens the chat); clicking the tag itself dismisses the nudge too, since the user has now found the assistant. Both the pulse and the nudge gate on `sessionStorage['mcs-labs.assistant-pulse.v1']` and `['mcs-labs.assistant-nudge.v1']` so returning visitors aren't nagged. The pull tag is now reachable on phones too — the previous `@media (max-width: 480px) { .wc-tag { display: none; } }` rule has been dropped.
+- **"Request account" CTAs.** A small accent-colored pill in the masthead and a distinct success-green button in the home hero (next to *Browse all events* / *Browse all labs*), each opens the chat panel via `data-wc-account-cta` so users on the home or any page can reach the assistant directly when they're trying to get a Microsoft 365 account. The masthead pill is hidden below 480 px to keep the nav compact; the hero button goes full-width on mobile.
+- **Back-to-top button on lab pages.** A floating accent-colored button at the bottom-right of the viewport appears once the user has scrolled past 400 px and smooth-scrolls to the top on click. Hides while the chat panel is open so it doesn't fight the panel for the bottom-right corner. Sized at 44×44 on desktop, bumped to 48×48 with 16 px inset on mobile (≤ 640 px) for a comfortable tap target. Lab layout only.
+- **Design tokens for success-color text and hover.** New `--color-on-success` and `--color-success-hover` tokens in `_tokens.scss` across all four palettes (Light / Dark / HC / system) so success-themed surfaces (currently the hero "Request an account" button) follow the active theme instead of hardcoding white-on-dark-green.
+- **Event-aware navigation.** Labs opened from an event page now show an in-lab rail below the header with the event name, `Lab X of Y` position, Previous / Next lab buttons, and an expandable agenda popover. A matching pair of Previous / Next cards renders at the bottom of the lab. Breadcrumbs override to `Home / Events / <Event> / <Lab>` when an event context is active. Event context sticks via `sessionStorage['mcs-labs.event-context.v1']` so the user keeps in-event navigation even when they click internal links that don't carry `?event=`.
+- **Event agenda data model (`_data/agendas/<event_id>.yml`).** Each event can now declare a full schedule with labs, sessions, breaks, and external links. The event detail page renders this as a timeline; non-lab items (welcome, Q&A, lunch, etc.) display inline. Events without an agenda file fall back to the existing `labs:` array — no migration required.
+- **Slides download chips on session rows.** Session entries in an agenda can declare `slides:` pointing to a file in `/presentations/`; the event timeline renders a small accent-tint "Slides" chip below the session title that downloads the deck when tapped. Wired to all Bootcamp + MCS in a Day modules.
+- Homepage "Browse all labs →" link replacing the Learning paths grid.
+
+- Accessibility settings menu in the masthead: theme switcher (Light, Dark, High contrast, Match system) and 3-step text size (A−, A, A+). Preferences persist in `localStorage` under `mcs-labs.prefs.v1`. A pre-paint inline script applies the stored theme before CSS loads, preventing any flash of wrong theme on reload.
+- Dark-mode Rouge syntax highlighting (Monokai-like palette) and high-contrast code blocks under `[data-theme="hc"]`.
+- Design-token layer (`assets/css/_tokens.scss`): all site colors now resolve through CSS custom properties with Light, Dark, and High contrast palettes plus a `System` option that follows `prefers-color-scheme`.
+- Global `prefers-reduced-motion` block that neutralizes panel slide, typing-dot pulse, and send-button transitions for motion-sensitive users.
+- Continuous a11y coverage on pull requests: `pa11y-ci` at WCAG 2.1 AA (`.github/workflows/a11y.yml`, `.pa11yci.json`) and Lighthouse CI requiring an accessibility score ≥ 95 (`.github/workflows/lighthouse.yml`, `lighthouserc.json`).
+
+### Changed
+- **Event-rail repainted with the brand accent + theme-aware text.** The in-lab event navigation rail (event name, *Lab X of Y* pill, Prev / Next / agenda buttons) now uses `var(--color-accent)` as the background and `var(--color-accent-on)` for every text and tint, so it recolors automatically under Light / Dark / HC. Translucent surfaces (hover background, position pill, expanded-agenda toggle) use `color-mix(in srgb, var(--color-accent-on) X%, transparent)` so they stay tinted relative to the foreground. Bolder labels (font-weight 700) and `stroke-width: 2.5` on chevrons for legibility against the lighter dark-theme accent. Disabled buttons (e.g. *Prev* on Lab 1) drop saturation but keep the hue via `color-mix` instead of blanket `opacity: 0.4`, so they read as part of the same surface.
+- **Event navigation is now sticky.** The × button that exited the event context has been removed (CSS `display: none`; the JS handler reference stays intact). Once a learner enters via `?event=`, the rail and breadcrumb stay through the lab path until the session ends or they navigate away from event-linked pages.
+- **Masthead stays full-width when the Lab Assistant is open.** Previously the body's `padding-right: 480px` (applied at ≥ 1024 px when the panel is open) also squeezed the masthead, triggering the greedy-nav to collapse links into the *More* overflow menu. The masthead now gets a compensating `margin-right: -480px` so the nav links stay visible. Page content below still shifts left for the panel as before.
+- Lab Assistant chat persists across in-tab page navigation using `sessionStorage` (no cookies). Token, Direct Line conversation, and transcript are preserved; state clears when the tab closes. Open/closed panel state also survives navigation.
+- Lab Assistant panel no longer overlaps the site masthead on small screens — panel top now tracks the masthead's live height.
+- Lab Assistant now shifts main content instead of overlaying it at viewports ≥ 1024 px. Below 1024 px the panel continues to overlay; at 1440 px+ both the TOC and the panel stay on-screen. The TOC collapses when the panel is open between 1024–1440 px to keep the content column readable.
+- Lab Assistant pull-handle is now a native `<button>`; gains automatic keyboard activation and focus semantics.
+- Pinned `minimal-mistakes-jekyll` to `= 4.27.3` to protect the new `_includes/masthead.html` shadow from silent upstream drift.
+
+### Fixed
+- **Duplicate title + description block hidden at the top of every lab.** Lab markdown files repeat `# <Title>` and the description right after the front matter — between two `---` rules — which produces a leading `<hr><h1><p><hr>` quartet inside `.page__content`. The colorful `.lab-header` above already renders `page.title` + `page.description`, so this prefix was duplicate content. A `:has()`-based CSS rule in `_layouts/lab.html` hides the four elements when the pattern matches; labs that don't follow the convention are untouched. Markdown content is unchanged.
+- **Inline "## Table of Contents" section hidden in labs.** The right-sidebar *On this page* nav already provides the same navigation, so the inline TOC was duplicate scaffolding. Hidden via CSS targeting `h2#table-of-contents` plus the list and trailing `<hr>`. The corresponding *Table of Contents* entry in the sidebar nav is also hidden via `.toc__menu li:has(> a[href="#table-of-contents"])` so the auto-built sidebar doesn't surface it either.
+- Cross-lab prerequisite links across `_labs/*.md` were rendered as `../<slug>/README.md`, which 404s on the deployed Jekyll site (`labs/*/README.md` is excluded from the build per `_config.yml`). Replaced with Jekyll-canonical `{% link _labs/<slug>.md %}` form so they resolve to the live lab page URL. Touched `_labs/agent-builder-sharepoint.md`, `_labs/core-concepts-analytics-evaluations.md` (two links), and `_labs/core-concepts-variables-agents-channels.md` (#274).
+- `core-concepts-analytics-evaluations` lab: standardized terminology to **"test method"** to match the *Edit test case* panel in the current Copilot Studio UI. Renamed the Core Concepts entry from *Evaluation Methods* → *Test Methods* with a note that older docs use the prior name. Updated five inline references (Summary of Targets, Use Cases table, UC#2 sub-table, *General Quality* description in UC#3 results, *Choose Test Methods Wisely* and *Test Methods Matter* lessons-learned bullets). Left the *Evaluation Test Sets* concept and headings unchanged — those still match Copilot Studio's "evaluation" / "evaluations" labels (#174).
+- `agent-builder-m365` lab Use Case #3 *Deep analysis with the Researcher agent*: corrected the Researcher panel location from *"right-side panel"* to *"left-side panel"* (line 567); converted hardcoded list markers (`2.`, `3.`, `4.`, `5.`, `6.`, `7.`, `8.`) to Markdown's auto-numbered `1.` so each sub-section's list renders cleanly instead of restarting awkwardly across `####` headings (#238); added a NOTE under Prompt 1 warning learners that Researcher may ask a follow-up about report length and that replying `go ahead` accepts the default (#236); added a step under Prompt 2 calling out the **Convert to** menu (Infographic / HTML / YAML / C# / etc.) so learners discover that capability.
+- `autonomous-account-news` lab UC#4: renamed the global variables from `searchResults` and `relevantNewsForOpportunities` (which collided with same-named topic input variables and tripped Copilot Studio's *"variable name already exists"* validation) to `globalSearchResults` and `globalRelevantNewsForOpportunities`. Updated the YAML snippets and all later `Global.*` references throughout the lab. Tightened the *"select Formula, then type Topic.Formula"* set-variable wording (which implied a non-existent `Topic.Formula` variable) to *"click the **fx** (formula) option and enter `Topic.<name>`."* — and added a TIP explaining the global/topic same-name validation rule (#216, #217).
+- `agent-builder-m365` lab Use Case #1: removed the *"If the proposed agent has a name other than Copilot Teacher…"* conditional. Beginners had no way to check the proposed name yet (the Configure tab where the name is visible isn't introduced until later in the lab), so the conditional was unanswerable. Step is now unconditional — applying the prompt is harmless if the proposed name was already correct (#284).
+- `agent-builder-m365` lab Use Case #1: split the dual-URL knowledge-source prompt (*"Use … and … as knowledge sources"*) into two sequential single-URL prompts. Agent Builder was observed to register only one of the URLs when both appeared in a single prompt; splitting them is reliable per the reporter (#283).
+- `core-concepts-variables-agents-channels` lab UC3: the Channels page entry was renamed from *"Teams and Microsoft 365 Copilot"* to **"Microsoft 365 and Microsoft Teams"**, and the *"Turn on Teams" / "Enable"* control was replaced with a *"Make agent available in Microsoft 365 Copilot"* checkbox. Updated the Channels page reference, replaced the obsolete activation step with the checkbox action, and inserted the previously-missing step to re-select the channel after the in-panel publish so the activation flow makes sense (#285).
+- `core-concepts-analytics-evaluations` lab: prerequisites previously claimed *"even test conversations count for analytics data"* — they don't. Rewrote the prereq to require a **published** agent used through a **deployed channel**, and added a NOTE clarifying that test-canvas conversations may not populate analytics so learners can prep their data before Use Case #1 (#287).
+- `core-concepts-analytics-evaluations` lab: Use Case #2 *Manually Create Test Cases from Test Canvas* — removed the obsolete *"Select New evaluation"* and *"In More ways to start, select Use your test chat conversation"* steps that no longer match the current UI (Copilot Studio now jumps straight from **Evaluate** to the new test-set view). Renumbered the surviving "Change the test set name" step from a leftover hardcoded `21.` to a continuous `1.` so the rendered list flows cleanly. Added a NOTE explaining the UI change for learners following older instructions (#286).
+- `mcs-tools` lab: replaced four occurrences of *"Turn off / disable **Use general knowledge**"* with *"Turn off / disable **Allow ungrounded responses**"* to match the renamed Copilot Studio toggle. Updated surrounding NOTE / "Lessons learned" lines to use the new toggle name; left a brief historical reference to the prior label in one NOTE so existing learners can match what they remember (#288).
+- `mcs-governance` lab: Yellow Zone (Part 2) and Red Zone agent-creation flows previously told learners to "double-check that the correct **Solution** is selected" before any Solution had been created in the `Bootcamp Yellow` / `Bootcamp Red` environments — Solutions are environment-scoped, so the Green Zone Solution was not available. Mirrored the Green Zone pattern by inserting a **Create a Solution** sub-section in each zone (using the same `<username>` naming convention) and rewording the agent-creation step to "select the Solution you just created" (#289).
+- Lab Assistant greeting-card "topic starter" tiles (Product / Pricing / How-To) were unreadable in Dark and High-contrast themes — Adaptive Card SDK baked a near-white inline `background-color` on the tile while the site's `.ac-textBlock` override forced the label to white, producing white text on white. Repaint the tile with `--color-bg-elevated` in Dark / HC / system-dark and invert the bundled monochrome tile icons so they stay visible.
+- Restore lab content overwritten by the redesign merge (PR #265). The `_labs/*.md` collection was frozen at 2026-03-06 and missed subsequent content PRs (#215, #224, #225, #234, #242, #244, #245, #248, #249, #250, #251, #252, #253, #254, #255, #256, #257, #258). Rewrote every lab body from the authoritative `labs/*/README.md` source.
+- Re-apply PR #246 orphan-lab removal: delete `public-website-agent` and `ask-me-anything-30-mins` (lab files and navigation entries) that returned after the redesign merge.
+- Secondary-gray text tokens (TOC titles, timestamps, placeholders, hints) darkened to pass WCAG 2.1 AA contrast; previously several fell between 1.8:1 and 3.3:1.
+- Visible keyboard focus ring on the Lab Assistant send input; previously `outline: none !important` stripped it with no fallback.
+- Lab Assistant decorative SVG icons now carry `aria-hidden="true" focusable="false"` so screen readers skip them.
+- Lab Assistant send input is now associated with a `<label>` (`Message Lab Assistant`) — placeholder alone was not sufficient for assistive tech.
+- Lab Assistant panel announces with `role="dialog"` + `aria-labelledby` and exposes `aria-expanded` on its trigger; previously announced as a generic complementary region with no expanded state.
+
+## 3.2.0 - 2026-03-20
+
+### Added
+- Presentation decks added to presentations folder (#227)
+- Presentations folder structure (#205)
+
+## 3.1.0 - 2026-02-26
+
+### Added
+- Optional Work tab experience steps to agent-builder-m365 lab (#190)
+- Bug Bash guide for reporting lab issues (#151)
+- Report Issue button to site navigation (#152)
+- mcs-governance lab, mcs-in-a-day-v2 event (#149, #150)
+- Required solution files for labs (#145)
+- New ALM consolidated lab combining setup-for-success and pipelines (#143)
+- Copilot Studio Tools lab (#142)
+- Dataverse MCP Connector lab (#140)
+- New Component Collections lab (#139)
+- Dataverse search steps (#137)
+- Copilot Studio bootcamp labs (#129)
+
+### Changed
+- Use README as source of truth for lab durations (#161)
+- Update BUG-BASH.md portal link to point to bootcamp event page (#160)
+- Refine instructions for Copilot Studio agent creation (#157)
+- Updates from testing (#155, #156)
+- Update component collection name and contents in Component Collections lab (#147)
+- Update root README with all labs (#146)
+- Update core-concepts-variables-agents-channels from testing (#144)
+- Update multi-agent lab copy (#128)
+- Update licensing guide and file size (#130)
+- Refactor core concepts into three focused labs (#131)
+
+### Fixed
+- Fix note callout formatting in governance lab (#199)
+- Revise prompt for visual sales chart in README (#169)
+- Refine summary of prompt in README (#170)
+- Update governance lab agent URLs and fix Dockerfile multi-arch support (#197)
+- Add missing mcs-governance lab to README table (#154)
+- Fix mcs-ALM 404 by renaming folder to lowercase mcs-alm (#153)
+- Fix grammar and spelling throughout multi-agent lab (#138)
+- Restore multi-agent indexing (#136)
+
+## 3.0.0 - 2026-01-28
+
+### Added
+- New multi-agent lab (#122)
+- Human-in-the-loop lab — expense claims with approvals (#118)
+- Setup-for-success added to buildathon 1-month journey (#113)
+- Workflow concurrency controls (#112)
+
+### Changed
+- Update top-level docs for multi-agent lab (#124)
+- Multi-agent lab: Remove indexing instructions (#123)
+- Update bootcamp docs (#119)
+- Update AI builder labs (#111)
+
+### Fixed
+- Add .gitignore for data config (#121)
+- Fix typo in lab instructions (#120)
+- Add tip to Ask Me Anything lab (#116)
+- Fix minor typos (#110)
+
+## Unreleased
+
+### Added
 - Simplified single-source configuration format (ADR-012)
   - Labs now defined once in `labs:` section with all properties (title, difficulty, duration, section, order, journeys, events)
   - Adding a new lab requires ONE entry instead of 3-6

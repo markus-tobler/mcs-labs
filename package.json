@@ -1,18 +1,16 @@
 {
-  "name": "mcs-labs-documentation",
-  "version": "1.0.0",
-  "description": "Microsoft Copilot Studio Labs - Documentation Generator",
+  "name": "mcs-labs-a11y-ci",
+  "version": "0.0.0",
   "private": true,
+  "description": "Accessibility tooling dev deps for mcs-labs. No runtime code ships from here.",
   "scripts": {
-    "generate-pdf": "node .github/scripts/generate-pdf.js",
-    "transform-homepage": "node .github/scripts/transform-homepage-links.js",
-    "dev": "docker-compose up jekyll-dev",
-    "dev-build": "docker-compose up --build jekyll-dev"
+    "a11y": "pa11y-ci --config .pa11yci.json",
+    "lighthouse": "lhci autorun"
   },
   "devDependencies": {
-    "puppeteer": "^24.15.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "@lhci/cli": "^0.14.0",
+    "http-server": "^14.1.1",
+    "pa11y-ci": "^3.1.0",
+    "wait-on": "^7.2.0"
   }
 }
