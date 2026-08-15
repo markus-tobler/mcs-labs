@@ -84,7 +84,7 @@ This lab takes you through the complete journey from agent creation to a fully c
 ## ✅ Prerequisites
 
 * Access to Microsoft Copilot Studio (trial or licensed environment)
-* A document to upload as a knowledge source (PDF, Word, or text file) - or use the [Copilot Studio Licensing Guide (April 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/microsoft-365/Microsoft-Copilot-Studio-Licensing-Guide-April-2026.pdf)
+* A document to upload as a knowledge source (PDF, Word, or text file) - or use the [Copilot Studio Licensing Guide (June 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/bizapps/Microsoft-Copilot-Studio-Licensing-Guide-June-2026-PUB.pdf)
 * Basic familiarity with web browsers and form filling
 
 ---
@@ -144,24 +144,38 @@ Create a fully configured Copilot Studio agent with clear instructions, suggeste
 
 1. Navigate to [Microsoft Copilot Studio](https://copilotstudio.microsoft.com) and sign in with your credentials.
 
-1. In the agent creation form, provide the following information and select **Send**:
+1. In the left navigation, select **Agents**.
 
-   ```
-   Provide information and guidance on how to use Copilot Studio and prompt engineering.
-   ```
-1. Wait for the "Your agent has been provisioned." notification.
+1. Select the **down-arrow (chevron)** next to the **New Agent** button, then choose **New classic agent**.
 
-1. In the Details pane, select **Edit**
+   > [!NOTE]
+   > Leave the **New experience** toggle **on** — **New classic agent** opens the classic authoring canvas in a new tab without switching experiences. On a first sign-in you may see a one-time **Welcome to Microsoft Copilot Studio** consent dialog; select **Get Started** to dismiss it.
 
-1. Set the agent name to the following and select **Save**
+1. In the **Name your agent** dialog, enter the following name and select **Create**:
 
    ```
    Copilot Studio Assistant
    ```
 
-1. Select the dropdown for the agent's model.  Ensure that Claude Sonnet 4.6 is selected.   
-  
-1. Review the Instructions pane details, this prompt was created by Copilot Studio from your initial description. It should basically tell the agent to "Help users write prompts, create PowerFX formulas, and with navigating Copilot Studio features."
+1. Wait for the "Your agent has been provisioned." notification. Your agent opens on its **Overview** page.
+
+1. Confirm the agent's model is set to **Claude Sonnet 4.6** (the default for new classic agents).
+
+1. In the **Instructions** section, select **Edit**, paste the following, and save:
+
+   ```
+   You are the Copilot Studio Assistant. Your purpose is to help internal teams learn how to use Microsoft Copilot Studio and write effective prompts.
+
+   Guidelines:
+   - Answer questions about Copilot Studio features, concepts, and navigation.
+   - Help users write clear, effective prompts and explain prompt-engineering best practices, including the CARE framework (Context, Ask, Rules, Examples).
+   - When relevant, walk through the steps in the Copilot Studio interface.
+   - Keep responses concise, accurate, and grounded in official Microsoft documentation.
+   - If you are unsure, say so rather than guessing.
+   ```
+
+   > [!NOTE]
+   > A new classic agent starts blank — earlier versions of this lab relied on a describe-driven flow that auto-generated these Instructions, so you now add them here.
 
    > [!TIP]
    > Clear, specific instructions help your agent understand its role and provide consistent responses. Think of instructions as the agent's job description.
@@ -247,7 +261,7 @@ Add a document knowledge source to your agent and verify that it accurately answ
 
 1. In your Copilot Studio agent, Select  **Knowledge** in the top navigation bar for the agent.
 
-1. Download the [Copilot Studio Licensing Guide (April 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/microsoft-365/Microsoft-Copilot-Studio-Licensing-Guide-April-2026.pdf). Just make sure you have the file local on your computer.
+1. Download the [Copilot Studio Licensing Guide (June 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/bizapps/Microsoft-Copilot-Studio-Licensing-Guide-June-2026-PUB.pdf). Just make sure you have the file local on your computer.
 
 1. Select **+Add Knowledge** and select **Upload files** and use the file dialog to locate and select your downloaded license guide file from your local computer.
 

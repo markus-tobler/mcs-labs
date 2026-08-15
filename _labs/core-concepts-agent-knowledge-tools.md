@@ -1,5 +1,6 @@
 ---
 layout: lab
+module: core-concepts-part1
 title: "Build Intelligent Agents with Knowledge Sources, Tools, and Topics"
 order: 170
 duration: 45
@@ -100,7 +101,7 @@ This lab takes you through the complete journey from agent creation to a fully c
 ## Prerequisites
 
 * Access to Microsoft Copilot Studio (trial or licensed environment)
-* A document to upload as a knowledge source (PDF, Word, or text file) - or use the [Copilot Studio Licensing Guide (April 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/microsoft-365/Microsoft-Copilot-Studio-Licensing-Guide-April-2026.pdf)
+* A document to upload as a knowledge source (PDF, Word, or text file) - or use the [Copilot Studio Licensing Guide (June 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/bizapps/Microsoft-Copilot-Studio-Licensing-Guide-June-2026-PUB.pdf)
 * Basic familiarity with web browsers and form filling
 
 ---
@@ -136,7 +137,7 @@ In this lab, you'll build a Copilot Studio agent from the ground up, enhance it 
 
 ## Use Case #1: Create and Configure Your First Agent
 
-Build your first Copilot Studio agent with custom instructions, suggested prompts, and AI model configuration.
+Build your first Copilot Studio agent with custom instructions and AI model configuration.
 
 | Use case | Value added | Estimated effort |
 |----------|-------------|------------------|
@@ -144,13 +145,13 @@ Build your first Copilot Studio agent with custom instructions, suggested prompt
 
 **Summary of tasks**
 
-In this section, you'll learn how to create a new agent, configure its instructions and behavior, add suggested prompts, and select the appropriate AI model.
+In this section, you'll learn how to create a new agent, configure its instructions and behavior, and select the appropriate AI model.
 
 **Scenario:** You're building a "Copilot Studio Assistant" to help internal teams learn about Copilot Studio features, write effective prompts, and navigate the platform. This agent will serve as a learning companion grounded in official Microsoft documentation.
 
 ### Objective
 
-Create a fully configured Copilot Studio agent with clear instructions, suggested prompts, and Claude Sonnet 4.6 model selection.
+Create a fully configured Copilot Studio agent with clear instructions and Claude Sonnet 4.6 model selection.
 
 ---
 
@@ -158,41 +159,62 @@ Create a fully configured Copilot Studio agent with clear instructions, suggeste
 
 #### Create Your Agent
 
-1. Navigate to [Microsoft Copilot Studio](https://copilotstudio.microsoft.com) and sign in with your credentials.
+1. Go to [Microsoft Copilot Studio](https://copilotstudio.microsoft.com) and sign in with your credentials.
 
-1. In the agent creation form, provide the following information and select **Send**:
+   > [!IMPORTANT]
+   > On a first sign-in (especially for workshop / fresh-tenant accounts) you may see a one-time **Welcome to Microsoft Copilot Studio** consent dialog. Select **Get Started** to dismiss it. (If it later appears stacked *behind* the **Name your agent** dialog, select **Cancel** on that dialog, choose **Get Started**, then create the agent again.)
 
-   ```
-   Provide information and guidance on how to use Copilot Studio and prompt engineering.
-   ```
-1. Wait for the "Your agent has been provisioned." notification.
+1. In the left navigation, select **Agents**.
 
-1. In the Details pane, select **Edit**
+1. Select the **down-arrow (chevron)** next to the **New Agent** button, then choose **New classic agent**.
 
-1. Set the agent name to the following and select **Save**
+   ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+   > [!NOTE]
+   > Leave the **New experience** toggle **on**. **New classic agent** opens the classic authoring canvas while keeping you in the new experience — there's no need to switch experiences. (The classic create flow opens in a new browser tab.)
+
+1. In the **Name your agent** dialog, enter the following name and select **Create**:
 
    ```
    Copilot Studio Assistant
    ```
 
-1. Select the dropdown for the agent's model.  Ensure that Claude Sonnet 4.6 is selected.   
-  
-1. Review the Instructions pane details, this prompt was created by Copilot Studio from your initial description. It should basically tell the agent to "Help users write prompts, create PowerFX formulas, and with navigating Copilot Studio features."
+1. Wait for the **"Your agent has been provisioned."** notification. Your agent opens on its **Overview** page with the **Overview / Knowledge / Tools / Agents / Topics / Channels** tabs.
+
+   ![Provisioned Copilot Studio Assistant agent on its Overview page](images/classic-agent-created-overview.png)
+
+1. Confirm the agent's model is set to **Claude Sonnet 4.6**. This is the default for new classic agents; if it isn't selected, choose it from the **Select your agent's model** dropdown.
+
+1. In the **Instructions** section, select **Edit**, paste the following, and save:
+
+   ```
+   You are the Copilot Studio Assistant. Your purpose is to help internal teams learn how to use Microsoft Copilot Studio and write effective prompts.
+
+   Guidelines:
+   - Answer questions about Copilot Studio features, concepts, and navigation.
+   - Help users write clear, effective prompts and explain prompt-engineering best practices, including the CARE framework (Context, Ask, Rules, Examples).
+   - When relevant, walk through the steps in the Copilot Studio interface.
+   - Keep responses concise, accurate, and grounded in official Microsoft documentation.
+   - If you are unsure, say so rather than guessing.
+   ```
+
+   > [!NOTE]
+   > Earlier versions of this lab used a describe-driven flow that auto-generated these Instructions. A new classic agent starts blank, so you provide the Instructions here. Feel free to refine the wording.
 
    > [!TIP]
-   > Clear, specific instructions help your agent understand its role and provide consistent responses. Think of instructions as the agent's job description.
+   > Think of instructions as the agent's job description: clear, specific instructions help your agent understand its role and respond consistently.
 
 1. Scroll down to the **Knowledge** section and select **Add Knowledge**.
 
-1. Select Public website from the list of knowledge source options.
+1. Select **Public websites** from the list of knowledge source options.
 
-1. Input the following URL and select **Add**
+1. Input the following URL and select **Add**.
 
    ```
    https://learn.microsoft.com
    ```
 
-1. The website should appear in the list of links, select **Add to agent** to save the change.
+1. The website should appear in the list of links. Select **Add to agent** to save the change.
 
 
 #### Test Your Agent
@@ -203,9 +225,9 @@ Create a fully configured Copilot Studio agent with clear instructions, suggeste
    How do I begin using Copilot Studio?
    ```
 
-17. Review the agent's response. Notice how it references the Microsoft Learn knowledge source you provided.
+1. Review the agent's response. Notice how it references the Microsoft Learn knowledge source you provided.
 
-18. Observe the response quality and how the agent leverages its instructions to provide helpful, contextual guidance.
+1. Observe the response quality and how the agent leverages its instructions to provide helpful, contextual guidance.
 
 ---
 
@@ -225,7 +247,7 @@ Create a fully configured Copilot Studio agent with clear instructions, suggeste
 
 * If your agent gives generic responses, review and refine your instructions to be more specific about its role and expertise
 * Knowledge source indexing can take 2-5 minutes - wait before testing knowledge-specific questions
-* Suggested prompts improve user adoption - customize them to match your most common use cases
+* Selecting a more capable model (such as Claude Sonnet 4.6) generally improves reasoning quality, but you should still test with your own scenarios to confirm it's the right fit
 
 **Challenge: Apply this to your own use case**
 
@@ -261,11 +283,11 @@ Add a document knowledge source to your agent and verify that it accurately answ
 
 #### Add Document Knowledge Source
 
-1. In your Copilot Studio agent, Select  **Knowledge** in the top navigation bar for the agent.
+1. In your Copilot Studio agent, select  **Knowledge** in the top navigation bar for the agent.
 
-1. Download the [Copilot Studio Licensing Guide (April 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/microsoft-365/Microsoft-Copilot-Studio-Licensing-Guide-April-2026.pdf). Just make sure you have the file local on your computer.
+1. Download the [Copilot Studio Licensing Guide (June 2026)](https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/bade/documents/products-and-services/en-us/bizapps/Microsoft-Copilot-Studio-Licensing-Guide-June-2026-PUB.pdf). Just make sure you have the file local on your computer.
 
-1. Select **+Add Knowledge** and select **Upload files** and use the file dialog to locate and select your downloaded license guide file from your local computer.
+1. Select **+ Add knowledge** and select the **Upload file** option (the large drop-zone tile at the top of the Featured list). Click **select to browse** and use the file dialog to locate and select your downloaded license guide file from your local computer.
 
    > [!TIP]
    > You can upload multiple file types including PDF, Word documents (.docx), PowerPoint (.pptx), and text files. Each file can be up to 512 MB.
@@ -283,22 +305,23 @@ Add a document knowledge source to your agent and verify that it accurately answ
 
 #### Configure Knowledge Source Settings
 
-1. Once the document is indexed, Select on the knowledge source to view its details.
+1. Once the document is indexed, select on the knowledge source to view its details.
 
 1. Review the **Name** and **Description** fields. Update if needed to make the source easily identifiable.
 
 #### Check and disable Web Search
-The Use information from the web setting is available on the Generative AI settings page or the Web Search setting in the Knowledge section of the agent's Overview page. This setting lets your agent access broad, real-time, and up-to-date information beyond what is available in predefined or enterprise-specific knowledge bases. For our scenario, we want to keep the use of knowedge focused on our provided resources and not the broader web.
 
-1. Navigate to the Overview tab, scroll down to the Knowledge section
+The Use information from the web setting is available on the Generative AI settings page or the Web Search setting in the Knowledge section of the agent's Overview page. This setting lets your agent access broad, real-time, and up-to-date information beyond what is available in predefined or enterprise-specific knowledge bases. For our scenario, we want to keep the use of knowledge focused on our provided resources and not the broader web.
 
-1. Select Disabled on the Web Search option.
+1. Go to the Overview tab, scroll down to the Knowledge section
+
+1. Select **Disabled** on the Web Search option.
 
 #### Disable Ungrounded Responses
 
-1. Select the **Settings** tab at the top of the agent, then select the **Generative AI** menu.
+1. Select the **Settings** button at the top right of the agent (next to **Publish**). The Settings panel opens with **Generative AI** selected by default; if it isn't selected, choose **Generative AI** from the left navigation.
 
-1. Turn off the **Allow Ungrounded responses** setting.
+1. Scroll to the **Knowledge** section of the Generative AI settings page and turn off the **Allow ungrounded responses** toggle.
 
 1. Select **Save** to apply the change.
 
@@ -307,11 +330,11 @@ The Use information from the web setting is available on the Generative AI setti
 
 #### Set Knowledge Source as Official
 
-1. Navigate back to the **Overview** tab and scroll down to the **Knowledge** section.
+1. Go back to the **Overview** tab and scroll down to the **Knowledge** section.
 
 1. Select the uploaded licensing guide file to open its details.
 
-1. Set the source to **Official** and select **Save**.
+1. Set the source to **Official** and select **Got it** if prompted that this will update agent instructions.
 
    > [!NOTE]
    > Marking a knowledge source as **Official** in Copilot Studio tells the agent to treat that content as authoritative and trustworthy. When multiple knowledge sources are available, the agent will prioritize official sources over non-official ones when generating responses. This is especially useful for policy documents, licensing guides, and other content where accuracy is critical.
@@ -413,11 +436,14 @@ Create and configure two tools that extend your agent's capabilities beyond simp
 
 1. Select **Add a tool** and review the Tools page to understand the available options for creating new tools.
 
-1. Select **Connector** as the tool type (or browse available connectors).
+1. The Add tool dialog opens with a list of suggested connector actions. Either type **MSN Weather** in the search box at the top of the dialog (and press Enter), or click the **Connector** filter chip above the results table to narrow the list to connectors.
 
-1. Search for and in the **MSN Weather** connector section select the **Get current weather** action.
+   > [!NOTE]
+   > The **Create new** tile list at the top of the dialog (Agent flow, Prompt, Model Context Protocol, Computer use) is for net-new tool types — not for selecting an existing connector. Use the search box or the **Connector** filter instead.
 
-1. For the Connection, select **Create new connection**.
+1. In the **MSN Weather** connector section, select the **Get current weather** action.
+
+1. The connector configuration page opens with a **Connection** field labeled **Not connected**. Click that button to open the connection picker, then select **Create new connection** from the popover.
 
 1. When prompted, select **Create** to create the connection.
 
@@ -428,11 +454,11 @@ Create and configure two tools that extend your agent's capabilities beyond simp
    > [!IMPORTANT]
    > Maker credentials mean the tool authenticates using YOUR account. This is suitable for testing and internal tools. For production scenarios with end users, use connection references. For anonymous APIs and APIs that use API keys, you should also set these to maker-provided credentials so the connection is configured by the maker rather than requiring end users to authenticate.
 
-1. In the **Inputs** section, find the **Units** input. Change it from **Dynamically fill with AI** to **Custom value**.
+1. In the **Inputs** section, find the **Units** input. Change it from **Fill with AI** to **Custom**.
 
 1. Click into the value field and select **Imperial** or **Metric** depending on your preference.
 
-1. Review the tool configuration and click **Save**.
+1. Review the tool configuration and select **Save**.
 
 #### Test the Weather Tool
 
@@ -445,10 +471,12 @@ Create and configure two tools that extend your agent's capabilities beyond simp
    ```
 
 1. When the agent asks for a location, respond:
+
    ```
    Orlando
    ```
-1. Review the weather information returned by the agent. Notice how it uses the tool to fetch real-time data. Also notice that the agent automatically used the **Imperial** or **Metric** unit you selected earlier without asking the user — this is because you set that input to a custom value instead of letting the AI fill it dynamically.
+
+1. Review the weather information returned by the agent. Notice how it uses the tool to fetch real-time data. Also notice that the agent automatically used the **Imperial** or **Metric** unit you selected earlier without asking the user. This is because you set that input to a custom value instead of letting the AI fill it dynamically.
 
    > [!TIP]
    > If the agent doesn't use the tool automatically, check that the tool is enabled and that you've saved your agent configuration.
@@ -464,22 +492,26 @@ Create and configure two tools that extend your agent's capabilities beyond simp
 
 1. In the **Create new** section, select **Prompt**.
 
-1. Select the current name e.g., **Custom prompt...** at the top left and change the name to **Prompt Analyzer**.
+   > [!NOTE]
+   > The first time you open the Prompt builder, a **Define your intent** product tour (1 of 3) appears as a coachmark overlay. Click **X** to dismiss it (or step through with **Next**) before continuing.
 
-1. In the **Instructions** section, add the following :
+1. Select the current name for example, **Custom prompt...** at the top left and change the name to **Prompt Analyzer**.
+
+1. In the **Instructions** section, add the following:
 
    ```
    Analyze this prompt (replace with text) based upon the CARE Prompt Guidance to determine what are recommendations on how to improve writing the prompt and if it is very good. Respond using markdown language bolding and using bullets to make the answer more visually appealing to the user.
    ```
+
 1. In the instructions you just pasted select ** (replace with text)**.
 
 1. With ** (replace with text)** still selected, in the lower left of the dialog, select **Add content**
 
 1. Select **Text** from the list of content types.
 
-1. Input **PromptToAnalyze** for the name.
+1. Enter **PromptToAnalyze** for the name.
 
-1. Input **Summarize this text: "Text"** for the sample data.  This will be used to test the prompt.
+1. Enter **Summarize this text: "Text"** for the sample data.  This will be used to test the prompt.
 
 1. Select **Close**.
 
@@ -589,15 +621,15 @@ Create a custom topic that handles a specific user intent (mailing list signup) 
 
 #### Create a Topic with Description
 
-1. In your Copilot Studio agent, click **Topics** in the top navigation bar.
+1. In your Copilot Studio agent, select **Topics** in the top navigation bar.
 
 1. Select **+ Add a topic**.
 
 1. Select **Add from description with Copilot**.
 
-1. Input **Join Copilot Studio Mailing List** for the name of your topic.
+1. Enter **Join Copilot Studio Mailing List** for the name of your topic.
 
-1. Input the following description in the **Create a topic to...**:
+1. Enter the following description in the **Create a topic to...**:
 
    ```
    Join Copilot Studio Mailing List. Let the user provide their email address, first and last name to be added to the email mailing list for copilot studio announcements.
@@ -645,12 +677,13 @@ Create a custom topic that handles a specific user intent (mailing list signup) 
 
 1. Check your nodes and if you don't already have a node that thanks the user then select + after the last node and select a **Message** node.
 
-1. Input the following as the message
+1. Enter the following as the message:
+
    ```
    Thank you! Your information has been recorded. (In production, this would submit to the mailing list system.)
    ```
 
-11. Select **Save** to save your topic.
+1. Select **Save** to save your topic.
 
 #### Test the Mailing List Topic
 

@@ -134,7 +134,16 @@ Create an agent, build a custom topic, and package components into a reusable co
 
 1. Go to the Copilot Studio home page at <a href="https://copilotstudio.microsoft.com" target="_blank">copilotstudio.microsoft.com</a>.
 
-1. Select **Agents** on the left navigation.
+1. At the top of the page, turn **off** the **New experience** toggle to return to the previous (classic) experience. The **Start with an agent template** gallery used in this lab is only available in the classic experience.
+
+    ![The New experience toggle, shown switched on](images/new-experience-toggle.png)
+
+    > [!NOTE]
+    > When you turn the toggle off, a **Submit feedback to Microsoft** dialog appears. Select a reason (for example, **I'm missing a feature I need**), optionally add a comment, then select **Submit** and **Done**. Selecting **Cancel** keeps you in the new experience. The page then reloads into the classic experience.
+    >
+    > ![The Submit feedback dialog shown when switching back to the classic experience](images/switch-back-feedback-dialog.png)
+
+1. Select **Agents** on the top navigation.
 
 1. Scroll down to the **Start with an agent template** section.
 
@@ -143,6 +152,12 @@ Create an agent, build a custom topic, and package components into a reusable co
 1. Select the **Safe Travels** template.
 
 1. Select **Create** to make the agent.
+
+1. After the agent is created, return to the new experience: select **Home** in the top navigation, then select **Try now** on the **New Copilot Studio experience** banner. The page switches back to the new experience.
+
+    ![The New Copilot Studio experience banner with the Try now button](images/switch-back-try-now-banner.png)
+
+1. Select **Agents** in the left navigation and open your new **Safe Travels** agent to continue.
 
 #### Create a Sample Topic
 
@@ -258,9 +273,14 @@ Install a component collection in a new agent and verify that shared editing wor
 
 1. Select **Agents** on the left navigation menu.
 
-1. Select the **Create blank agent** button in the upper right corner.
+1. From the Agents list, select the down-arrow (chevron) next to **New Agent**, then choose **New classic agent**. In the **Name your agent** dialog, enter `Travel Hub` and select **Create**.
 
-1. This will create a blank agent. Wait for it to be provisioned.
+    ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+    > [!NOTE]
+    > Keep the **New experience** toggle ON — **New classic agent** opens the classic canvas in a new browser tab without switching experiences. On a first sign-in, a one-time **Welcome to Microsoft Copilot Studio** consent dialog may appear (select **Get Started**; if it stacks behind the **Name your agent** dialog, select Cancel, then Get Started, then create again).
+
+1. Wait for the agent to be provisioned.
 
 1. Once provisioned, go to **Settings** in the upper right corner.
 

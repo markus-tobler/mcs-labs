@@ -1,8 +1,9 @@
 ---
 layout: lab
+module: governance
 title: "Governance Zones in Copilot Studio"
 order: 195
-duration: 45
+duration: 30
 difficulty: 300
 lab_type: local
 section: intermediate_labs
@@ -88,7 +89,7 @@ By completing this lab, you will build hands-on intuition for how governance zon
 * [Data loss prevention policies in Power Platform](https://learn.microsoft.com/en-us/power-platform/admin/wp-data-loss-prevention)
 * [Environments overview in Power Platform](https://learn.microsoft.com/en-us/power-platform/admin/environments-overview)
 * [Knowledge sources in Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-studio)
-* [Model Context Protocol (MCP) in Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-mcp-overview)
+* [Model Context Protocol (MCP) in Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp)
 
 ---
 
@@ -154,7 +155,7 @@ Create a "Copilot Studio Advisor" agent in both the Green and Yellow zones, test
 
 1. Go to [Copilot Studio](https://copilotstudio.microsoft.com).
 
-1. Select the **Environment selector** in the top-right corner of the screen. It make take a few seconds for the **Environment** list to become visible.
+1. Select the **Environment selector** in the top-right corner of the screen. It may take a few seconds for the **Environment** list to become visible.
 
 1. Search for the following and select it:
 
@@ -181,45 +182,32 @@ Create a "Copilot Studio Advisor" agent in both the Green and Yellow zones, test
 
 #### Create the Agent
 
-1. Select **Home** in the left navigation to return to the main page.
+1. In the left navigation, select **Agents**.
 
-1. In the **"What would you like to build?"** pane, find the text area that says _"Start building by describing what your agent needs to do"_.
+1. On the Agents list, select the **down-arrow (chevron)** next to **New Agent**, then choose **New classic agent**.
 
-1. Enter the following text into the description field, but do not send it yet you will be adding more in the next step:
+    > [!NOTE]
+    > Keep the **New experience** toggle **ON**. **New classic agent** opens the classic canvas in a new browser tab without switching your experience. The first time you do this you may see a one-time **Welcome to Microsoft Copilot Studio** dialog — select **Get Started**. If that dialog is stacked behind the **Name your agent** dialog, select **Cancel**, complete **Get Started**, then retry **New classic agent**.
 
-    ```text
-    Help me build an agent that knows everything about building agents in Power Platform Copilot Studio. You're an expert, you're a coach, you give proactive advice on how to build Copilot Studio agents. And your knowledge is built on top of a SharePoint document.
-    ```
-
-1. After typing the description, add the following **SharePoint link** to the end of the instructions
-
-    ```
-    Here is the document to use as knowledge: https://copilotstudiotraining.sharepoint.com/:p:/s/Workshop/IQDYEPT5O76JR5akoXWdwO-PAR3IVlIBJ-RqZqpHy2cCRLs?e=qpIVD6
-    ```
-
-1. At the end of your instructions, add the following text:
+1. In the **Name your agent** dialog, enter the following and select **Create**:
 
     ```text
-    Please name this agent Copilot Studio Advisor [YourUsername]
+    Copilot Studio Advisor [YourUsername]
     ```
 
     > [!NOTE]
     > We add the username so we can find your agent easily in this shared environment.
 
-1. Before selecting the blue arrow to create, select the **Settings** wheel icon in the bottom-left corner.
-
-1. In the Settings pane, select the **Solution** you created earlier in this lab (named with your username).
-
-1. Optionally, give your agent a custom **Schema Name**.
+1. After the classic agent canvas opens, select **Settings** (gear icon) and confirm the agent is saved into the **Solution** you created earlier in this lab (named with your username). Optionally, give your agent a custom **Schema Name**.
 
     > [!TIP]
     > Schema names are used for advanced management of your agents. We advise using schema names in collaboration with the description. For example: `mcs_build_advisor_[YourUsername]_green`. Include the zone name (green, yellow, red) so you can tell them apart later.
 
-1. Select the **blue arrow** on the right side to submit and create your agent.
+1. A **New classic agent** is created blank — empty Instructions, default system topics, and the model defaults to Claude Sonnet 4.6. In the **Instructions** section, select **Edit**, paste the following, and save:
 
-1. Wait for Copilot Studio to build your agent. It will generate your name, description, and auto-generated instructions.
-
-1. Scroll down and notice that Copilot Studio has added suggested knowledge sources such as training hands-on labs, PowerPoint decks, and other capabilities.
+    ```text
+    You are an expert coach for building agents in Power Platform Copilot Studio. You give proactive, practical advice on how to design, build, and govern Copilot Studio agents. Ground every answer in the SharePoint Implementation Guide that has been added as knowledge, and cite it when you can. If a question cannot be answered from that knowledge, say so plainly rather than guessing.
+    ```
 
 #### Add SharePoint Knowledge
 
@@ -229,7 +217,7 @@ Create a "Copilot Studio Advisor" agent in both the Green and Yellow zones, test
 
 1. Select **Add knowledge**.
 
-1. Select **SharePoint**.
+1. In the knowledge-source list, locate the **SharePoint** card marked **Powered by Work IQ** (further down the list — **not** the SharePoint shortcut inside the *Upload file* card at the top, which uploads files to Dataverse and waits on indexing). Select that card.
 
 1. Enter the following for the URL:
 
@@ -296,7 +284,7 @@ Create a "Copilot Studio Advisor" agent in both the Green and Yellow zones, test
 1. Notice that `learn.microsoft.com` shows a status of **Blocked**.
 
     > [!IMPORTANT]
-    > The status message will say something like _"Not allowed due to your organizational data loss prevention policies. Contact your admin."_ This is the DLP policy in action, blocking public website knowledge in the Green zone. Additionally, publishing your agent will also be blocked while DLP policies are being enforced on knowledge sources. You must remove the blocked knowledge source before you can publish.
+    > The status will read **Blocked**, and the agent-status warning panel will explain it with text similar to: _"Your organization's data loss prevention policies do not allow the creation of triggers. The 'shared_microsoftcopilotstudio' connector or one of its tools is blocked by the following policy: Bootcamp Green. Contact your admin with questions."_ (Exact wording may vary; the message names the connector and the specific DLP policy that blocked it.) This is the DLP policy in action, blocking public website knowledge in the Green zone. Additionally, publishing your agent will also be blocked while DLP policies are being enforced on knowledge sources. You must remove the blocked knowledge source before you can publish.
 
 ---
 
@@ -328,30 +316,26 @@ Create a "Copilot Studio Advisor" agent in both the Green and Yellow zones, test
 
 #### Create the Yellow Zone Agent
 
-1. Select **Home** in the left navigation to return to the main page.
+1. In the left navigation, select **Agents**.
 
-1. In the **"What would you like to build?"** pane, copy and paste the following text:
+1. On the Agents list, select the **down-arrow (chevron)** next to **New Agent**, then choose **New classic agent**.
+
+1. In the **Name your agent** dialog, enter the following and select **Create**:
 
     ```text
-    Help me build an agent that knows everything about building agents in Power Platform Copilot Studio. You're an expert, you're a coach, you give proactive advice on how to build Copilot Studio agents. And your knowledge is built on top of learn.microsoft.com as a public website.
+    Copilot Studio Advisor [YourUsername]
     ```
 
-1. Before selecting the blue arrow, select the **Settings** wheel icon again.
-
-1. In the Settings pane, select the **Solution** you just created (named with your username).
-
-1. Give your agent a schema name similar to the Green zone but with `yellow` in it.
+1. After the classic agent canvas opens, select **Settings** (gear icon) and confirm the agent is saved into the **Solution** you just created (named with your username). Give your agent a schema name similar to the Green zone but with `yellow` in it.
 
     > [!TIP]
     > For example: `mcs_build_advisor_[YourUsername]_yellow`. Keeping a consistent naming pattern across zones helps you stay organized.
 
-1. Select the **blue arrow** to create the agent in the Bootcamp Yellow environment.
+1. A **New classic agent** is created blank. In the **Instructions** section, select **Edit**, paste the following, and save:
 
-1. Wait for the agent to be created. Your screen will say _"Getting things ready"_.
-
-1. Once ready, verify that the agent has your name, description, and auto-generated instructions.
-
-1. Scroll down and notice the knowledge suggestions again. You can add a couple that make sense for you.
+    ```text
+    You are an expert coach for building agents in Power Platform Copilot Studio. You give proactive, practical advice on how to design, build, and govern Copilot Studio agents. Ground your answers in the Microsoft Learn (learn.microsoft.com) public website that has been added as knowledge, and cite the pages you use. If a question cannot be answered from that knowledge, say so plainly rather than guessing.
+    ```
 
 #### Add Public Website Knowledge (Microsoft Learn)
 
@@ -409,7 +393,7 @@ Create a "Copilot Studio Advisor" agent in both the Green and Yellow zones, test
 1. Enter the following URL:
 
     ```text
-    microsoft.github.io/mcs-cat-blog
+    microsoft.github.io/mcscatblog
     ```
 
 1. Select **Add**.
@@ -500,36 +484,34 @@ Create a "Copilot Studio Advisor" agent in the Red zone with full public website
 
 #### Create the Red Zone Agent
 
-1. Select **Home** in the left navigation to return to the main page.
+1. In the left navigation, select **Agents**.
 
-1. In the **"What would you like to build?"** pane, copy and paste the following text:
+1. On the Agents list, select the **down-arrow (chevron)** next to **New Agent**, then choose **New classic agent**.
+
+1. In the **Name your agent** dialog, enter the following and select **Create**:
 
     ```text
-    Help me build an agent that knows everything about building agents in Power Platform Copilot Studio. You're an expert, you're a coach, you give proactive advice on how to build Copilot Studio agents. And your knowledge is built on top of the following sources:
-    https://learn.microsoft.com, https://microsoft.github.io/mcscatblog/
+    Copilot Studio Advisor [YourUsername]
     ```
 
-    > [!NOTE]
-    > The URLs provided are great resources to be used for learning more about Copilot Studio.
-
-1. Select the **Settings** wheel icon.
-
-1. In the Settings pane, select the **Solution** you just created (named with your username).
-
-1. Give your agent a schema name with `red` in it, following the same pattern as before.
+1. After the classic agent canvas opens, select **Settings** (gear icon) and confirm the agent is saved into the **Solution** you just created (named with your username). Give your agent a schema name with `red` in it, following the same pattern as before.
 
     > [!TIP]
     > For example: `mcs_build_advisor_[YourUsername]_red`
 
-1. Select the **blue arrow** to create the agent.
+1. A **New classic agent** is created blank. In the **Instructions** section, select **Edit**, paste the following, and save:
 
-1. Wait for the agent to be created.
+    ```text
+    You are an expert coach for building agents in Power Platform Copilot Studio. You give proactive, practical advice on how to design, build, and govern Copilot Studio agents. Ground your answers in the public website knowledge sources that have been added (Microsoft Learn and the MCS CAT blog), and cite the pages you use. Prefer authoritative, official sources when they conflict with community content.
+    ```
 
-1. Once ready, verify your agent has the correct name, description, and instructions.
-
-1. Scroll down. You should see that the URLs you provided in the prompt have been added as suggestions.
+    > [!NOTE]
+    > These are great resources for learning more about Copilot Studio: `https://learn.microsoft.com` and `https://microsoft.github.io/mcscatblog/`. You will add them as knowledge in the next section.
 
 #### Add Public Website Knowledge
+
+> [!NOTE]
+> **Suggested knowledge sources may not appear.** The "suggested knowledge sources" prompts described below were generated by the older conversational (describe-driven) build flow. When the agent is created via **New classic agent**, the classic editor does **not** auto-suggest knowledge sources from a prompt. If you do not see a suggestions pane, add each public website manually: select the **Knowledge** tab → **Add knowledge** → **Public websites**, then add `learn.microsoft.com` and `microsoft.github.io/mcscatblog` one at a time. (This step is flagged for author redesign.)
 
 1. In the suggestions pane, select **Add** next to the suggested knowledge sources. If for any reason your browser refreshes the list of suggestions will not be there.
 

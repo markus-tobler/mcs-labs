@@ -148,9 +148,13 @@ Create a custom connector for the Free Dictionary API, add it as a tool in your 
 
 1. Select **Agents** on the left navigation.
 
-1. Select **Create blank agent** in the upper right corner.
+1. Turn **OFF** the **New experience** toggle (look for the banner or toggle at the top of Copilot Studio). When the feedback pop-up appears, select **Submit**. This switches you to the classic Copilot Studio experience.
 
-1. Once the agent is provisioned, rename it to `Dictionary Agent` by selecting  **Edit** in the **Details** section on **Overview**.
+    ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+1. Select **Agents** in the left navigation, then select **Create blank agent**. In the **Name your agent** dialog, enter `Dictionary Agent` and select **Continue**.
+
+1. Once the agent is provisioned, confirm its name is `Dictionary Agent`. If you need to change it, select **Edit** in the **Details** section on **Overview**.
 
 1. Enter the following as the **Description:**
 
@@ -353,6 +357,8 @@ Create a custom connector for the Free Dictionary API, add it as a tool in your 
     > [!NOTE]
     > Disabling general knowledge make sure that only your custom connector API provides answers, not the underlying language model.
 
+1. Turn off **Use information from the Web** as well.
+
 1. Select **Save**.
 
 1. Close **Settings** using the **X** in the upper right-hand corner.
@@ -364,11 +370,11 @@ Create a custom connector for the Free Dictionary API, add it as a tool in your 
     ```
 
     ```
-    Where does it come from?
+    How about the word amazing?
     ```
 
     ```
-    How about the word amazing?
+    How do I pronounce the word "leverage" in English?
     ```
 
 1. Verify that the agent uses your custom connector tool to retrieve definitions, origins, and phonetic information from the Free Dictionary API.
@@ -407,71 +413,40 @@ Build a Sales Commission Calculator using agent flows to implement deterministic
 
 **Summary of tasks**
 
-In this section, you'll learn how to create an agent flow with deterministic business logic, implement tier-based commission calculations using Power Fx, build a conversational topic that collects inputs and calls the flow, and test multiple scenarios to validate business rules.
+In this section, you'll explore a pre-created agent that uses an agent flow for deterministic business logic, see how tier-based commission calculations are implemented with Power Fx, and test multiple scenarios to validate the business rules.
 
 **Scenario:** Contoso Electronics has a sales team that needs instant visibility into their commission earnings. Commission calculations involve performance tiers with different percentage rates and product mix bonuses - rules that must always produce the same result for the same inputs. Agent flows are the ideal tool because they provide deterministic, rule-based processing rather than AI-generated responses.
 
 ### Objective
 
-Create an agent flow that calculates sales commissions using deterministic business rules, build a conversational topic to collect inputs, and test the complete workflow.
+Use a pre-created agent that calculates sales commissions with deterministic business rules, and test the complete workflow across multiple scenarios.
 
 ---
 
 ### Step-by-step instructions
 
-#### Create a New Agent
+#### Open the Pre-Created Agent
 
 1. Go to **Microsoft Copilot Studio** at <a href="https://copilotstudio.microsoft.com" target="_blank">copilotstudio.microsoft.com</a>.
 
-1. Select **Agents** on left navigation.
+1. Make sure you are in the **New Copilot Studio experience** — look for the banner or toggle at the top and select **Try now** (or turn the **New experience** toggle ON).
 
-1. Select **Create blank agent** in the upper right corner.
+1. Select **Agents** on left navigation, then open the pre-created **Sales Commission Assistant** agent.
 
-    > [!TIP]
-    > The agent creation may take 30-60 seconds. You'll see a loading indicator while your agent is being provisioned.
+    > [!NOTE]
+    > The **Sales Commission Assistant** agent has already been created and configured for you, and the **Calculate Sales Commission** agent flow is already connected as a tool. In a real implementation, you would create the agent and wire up the flow yourself — this lab provides them so you can focus on understanding how deterministic agent flows work.
 
-1. Select **Edit** in the **Details** section.
+1. (Optional) Review how the agent is configured so you understand what was set up for you:
 
-1. Enter the following details:
-
-   - **Name:**
-     ```
-     Sales Commission Assistant
-     ```
-   - **Description:**
-     ```
-     Calculates sales commissions based on performance data
-     ```
-
-1. Select **Save** in the upper right corner of the **Details** section.
-
-1. On the **Overview** page, scroll down to the **Knowledge** section and turn off **Web Search**.
-
-1. Select **Edit** in the **Instructions** section and enter the following:
-
-    ```
-    When collecting information for a tool, always ask for one piece of information at a time.
-    ```
-
-1. Select **Save**.
+    - On the **Overview** page, the **Description** is set to `Calculates sales commissions based on performance data`, and **Web Search** is turned off in the **Knowledge** section.
+    - The **Instructions** section contains: `When collecting information for a tool, always ask for one piece of information at a time.`
+    - In the **Tools** section, the **Calculate Sales Commission** agent flow is connected.
 
     > [!NOTE]
     > Using instructions to explain how you want the agent to behave when collecting information is a good example of how Instructions should be used in agents. Instructions guide the agent's conversational behavior without requiring you to build explicit topics or flows for every interaction pattern.
 
-#### Add the Agent Flow
-
-1. In the top navigation panel, select **Tools**.
-
-1. Select **+ Add a tool**.
-
-1. In the filter list, select **Flow**.
-
-1. Select the pre-created **Calculate Sales Commission** flow from the results.
-
-1. Select **Add and configure**.
-
     > [!TIP]
-    > This flow has already been provisioned for you with the commission calculation logic, input parameters, and response configuration. In a real implementation, you would build the agent flow yourself using Power Fx expressions — the logic could be as complex as needed and could use all the capabilities of flow.
+    > The **Calculate Sales Commission** flow has already been provisioned for you with the commission calculation logic, input parameters, and response configuration. In a real implementation, you would build the agent flow yourself using Power Fx expressions — the logic could be as complex as needed and could use all the capabilities of flow.
 
 #### Test Your Commission Calculator
 
@@ -589,11 +564,11 @@ Create and configure a Copilot Agent with Dataverse MCP Server integration that 
 
 #### Create and Configure the Agent
 
-1. Go to [Copilot Studio](https://copilotstudio.microsoft.com/). Make sure you are logged in using the credentials for the lab and are in the correct environment.
+1. Go to [Copilot Studio](https://copilotstudio.microsoft.com/). Make sure you are logged in using the credentials for the lab and are in the correct environment, and that you are in the **New Copilot Studio experience** — if a banner or toggle offers it, select **Try now** (or turn the **New experience** toggle ON).
 
-1. Select **Agents** in the left navigation then select **Create blank agent** in the upper right corner.
+1. Select **Agents** in the left navigation, then select the down-arrow (chevron) next to **New Agent** and choose **New classic agent**. In the **Name your agent** dialog, enter `Contoso Agent` and select **Create**.
 
-1. Select **Edit** and fill in the Name and Description:
+1. Select **Edit** and confirm the Name and add the Description:
 
    **Name:** `Contoso Agent`
 
@@ -645,7 +620,7 @@ Create and configure a Copilot Agent with Dataverse MCP Server integration that 
 
 1. Select **Add and configure**.
 
-9. Review the tools available for the Dataverse MCP Server. You can select and deselect which tools are available to the agent. When the tool is executed, the list is dynamically updated from the MCP Server.
+1. Review the tools available for the Dataverse MCP Server. You can select and deselect which tools are available to the agent. When the tool is executed, the list is dynamically updated from the MCP Server.
 
     ![Review MCP tools](images/step9-review-mcp.png)
 
@@ -740,9 +715,9 @@ Create a Chit Chat Agent with a custom prompt tool that controls response behavi
 
 1. Go to [Copilot Studio](https://copilotstudio.microsoft.com/). Make sure you are logged in using the credentials for the lab and are in the correct environment.
 
-1. Select **Agents** in the left navigation then select **Create blank agent** in the upper right corner.
+1. Select **Agents** in the left navigation, then select the down-arrow (chevron) next to **New Agent** and choose **New classic agent**. In the **Name your agent** dialog, enter `Chit Chat Agent` and select **Create**.
 
-1. Once the agent is provisioned, rename it to **Chit Chat Agent** by selecting **Edit** in the **Details** section.
+1. Once the agent is provisioned, confirm its name is **Chit Chat Agent**. If you need to change it, select **Edit** in the **Details** section.
 
 1. Enter the following as the **Description:**
 
@@ -923,11 +898,9 @@ Create an autonomous agent that uses the Computer use tool to retrieve portfolio
 
 1. Go to [copilotstudio.microsoft.com](https://copilotstudio.microsoft.com).
 
-1. Select **Agents** in the left navigation and then select **Create from blank** in the upper right corner.
+1. Select **Agents** in the left navigation, then select the down-arrow (chevron) next to **New Agent** and choose **New classic agent**. In the **Name your agent** dialog, enter `Portfolio Lookup Agent` and select **Create**.
 
-1. In the **Details** section select **Edit** and change the name to **Portfolio Lookup Agent**.
-
-1. Select **Save**.
+1. Once the agent is provisioned, confirm its name is **Portfolio Lookup Agent**. If you need to change it, select **Edit** in the **Details** section and select **Save**.
 
 #### Configure Email Triggers
 

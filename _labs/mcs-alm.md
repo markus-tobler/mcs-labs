@@ -1,5 +1,6 @@
 ---
 layout: lab
+module: alm
 title: "Application Lifecycle Management (ALM) in Copilot Studio"
 order: 280
 duration: 45
@@ -71,9 +72,8 @@ Application Lifecycle Management (ALM) ensures that your solutions evolve safely
 **Real-world example:** Your customer service agent is ready for production. With a proper ALM setup, the deployment process becomes:
 1. Structure your work in a solution with a custom publisher
 2. Configure environment variables and connection references for portability
-3. Track all changes in Git source control
-4. Deploy through governed pipelines from DEV to ALM Prod
-5. Validate environment-specific settings post-deployment
+3. Deploy through governed pipelines from DEV to ALM Prod
+4. Validate environment-specific settings post-deployment
 
 Without ALM, each of these steps is manual, error-prone, and difficult to repeat. With ALM, it becomes an automated, auditable, and confident workflow.
 
@@ -172,9 +172,12 @@ Set up your development environment by creating a solution and custom publisher 
 
 #### Create a Solution
 
-1. In the left navigation (under the **...** menu), select **Solutions**.
+1. In the left navigation, select **Explore Power Platform** (the icon button at the bottom of the left nav). In the flyout menu that opens, choose **Solutions** under the **Explore** section.
 
     ![Copilot Studio navigation menu with Solutions option highlighted](images/solutions.png)
+
+    > [!NOTE]
+    > Selecting **Solutions** opens a new browser tab. Stay in the new tab for the rest of this use case — the original Copilot Studio Home tab is no longer needed. The Solutions surface itself is the Power Apps maker portal embedded in Copilot Studio.
 
 1. Select **New solution**.
 
@@ -191,7 +194,7 @@ Set up your development environment by creating a solution and custom publisher 
 
 #### Create a Publisher
 
-1. If you see a publish with your User name you can select that one, otherwise select **+ New publisher** to create one.
+1. If you see a publisher with your User name you can select that one, otherwise select **New publisher** to create one.
 
 > [!TIP]
 > - Use the **username provided to you for logging into the lab** as the publisher name.
@@ -257,15 +260,15 @@ Create environment variables and connection references that enable your solution
 
 1. Open the solution you created in Use Case #1. If you didn't navigate away after the create it should leave you in the solution.
 
-2. Select **+ New**, then select **More** and choose **Environment variable**.
+1. Select **New**, then select **More** and choose **Environment variable**.
 
     ![Copilot Studio showing New menu expanded with Environment variable option highlighted](images/environment-variable-connection-reference.png)
 
-3. In **Name**, enter: `Custom Knowledge Endpoint`, then add your User Name to make it unique. We are only doing this because you will be deploying to a shared environment.
+1. In **Display name**, enter: `Custom Knowledge Endpoint`, then add your User Name to make it unique. We are only doing this because you will be deploying to a shared environment. The **Name** field below will auto-populate with a `cat_` prefixed schema name (e.g. `cat_CustomKnowledgeEndpointU2sypp5l9`) — leave that as-is.
 
-4. In **Data Type**, select **Text**.
+1. In **Data Type**, select **Text**.
 
-5. Leave **Default Value** blank, but under **Current Value**, select **+ New Value**, and enter the Custom Knowledge endpoint URL found in the [Lab Resources](https://copilotstudiotraining.sharepoint.com/sites/Workshop/SitePages/Lab-Assets.aspx).
+1. Leave **Default Value** blank, but under **Current Value**, select **+ New Value**, and enter the Custom Knowledge endpoint URL found in the [Lab Resources](https://copilotstudiotraining.sharepoint.com/sites/Workshop/SitePages/Lab-Assets.aspx).
 
     > [!IMPORTANT]
     > For configuration, use the provided values in the [**Lab Resources**](https://copilotstudiotraining.sharepoint.com/sites/Workshop/SitePages/Lab-Assets.aspx) (specific per training).
@@ -273,29 +276,29 @@ Create environment variables and connection references that enable your solution
     > [!TIP]
     > Notice how, under **Advanced**, you can set whether the current value can follow through with your solution deployment, or if it should be reset each time the solution is deployed to a new environment.
 
-6. Select **Save**.
+1. Select **Save**.
 
     > [!TIP]
     > Environment variables can also be of type **Secret** to retrieve secure values like API keys from Azure Key Vault at runtime.
 
-7. In the solution, select **New**, then select **More** and choose **Connection reference**.
+1. In the solution, select **New**, then select **More** and choose **Connection Reference**.
 
-8. Enter `ServiceNow` plus your User Name to make it unique , as the name. 
+1. Enter `ServiceNow` plus your User Name to make it unique , as the name. 
 
     > [!TIP]
     > In other locales, the connector name may be localized.
 
-9. Select the connector **ServiceNow**.
+1. Select the connector **ServiceNow**.
 
-10. In the connection dropdown, choose **New connection** if none exists.
+1. In the connection dropdown, choose **New connection** if none exists.
 
-11. Log in through Power Apps in a new tab if needed, then return to Copilot Studio.
+1. Log in through Power Apps in a new tab if needed, then return to Copilot Studio.
 
     > [!IMPORTANT]
     > - For **ServiceNow** configuration values, use the provided values in the [**Lab Resources**](https://copilotstudiotraining.sharepoint.com/sites/Workshop/SitePages/Lab-Assets.aspx) (specific per training).
     > - For **ServiceNow**'s `Instance` configuration, be sure to scroll down in the connection screen.
 
-12. Above the **Connection** dropdown, select **Refresh** and choose the newly created connection.
+1. Above the **Connection** dropdown, select **Refresh** and choose the newly created connection.
 
 > [!TIP]
 > If the **Create** button is grayed out, it's because you pasted the display name. Type an extra character in the display name field and remove it to enable the button.
@@ -355,13 +358,29 @@ Create a deployment pipeline that automates solution deployment across environme
 
 1. Go to the Copilot Studio home page at <a href="https://copilotstudio.microsoft.com/" target="_blank">copilotstudio.microsoft.com</a>
 
-1. Enter the following to describe the agent you wish to create, but do NOT choose to create it yet:
+1. In the left navigation, select **Agents** to open the Agents list. Select the down-arrow (chevron) next to **New Agent**, then choose **New classic agent**. In the **Name your agent** dialog, enter `Microsoft Surface Guide` and select **Create**.
+
+    ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+    > [!NOTE]
+    > Keep the **New experience** toggle **ON** — **New classic agent** opens the classic canvas in a new tab without switching experiences. A one-time **Welcome to Microsoft Copilot Studio** consent dialog may appear; select **Get Started**. If it stacks behind the **Name your agent** dialog, select **Cancel**, then **Get Started**, then retry.
+
+1. Confirm that **Claude Sonnet 4.6** is selected as the agent's model (this is the default).
+
+1. In the **Instructions** section, select **Edit**, paste the following, and save:
 
     ```
-    Create a Microsoft Surface Guide agent that knows everything about the Surface devices and can help guide users to pick the one that would be best for how they work. It should use the information from https://www.microsoft.com/en-us/surface as an official knowledge source
+    You are the Microsoft Surface Guide, an agent that knows everything about Microsoft Surface devices and helps users pick the device that best fits how they work.
+
+    - Use the Surface knowledge source (https://www.microsoft.com/en-us/surface) as your official, authoritative source for product details, specifications, and comparisons.
+    - Ask clarifying questions about the user's needs (portability, performance, budget, screen size, pen/touch, battery life) before recommending a device.
+    - Recommend the most appropriate Surface device(s) and briefly explain why each one fits the user's stated needs.
+    - Keep responses concise, friendly, and grounded in the official Surface information. If you are unsure, say so rather than guessing.
     ```
 
-1. Before saving, select the **gear icon** (Settings) on the agent and update the **Schema name** to include your UserID. For example, if your username is `user.xibbqhpx`, set the schema name to include `xibbqhpx`.
+1. Add the Surface website as a knowledge source: in the **Knowledge** section, add a public website and enter `https://www.microsoft.com/en-us/surface`.
+
+1. Before creating the agent in your solution, select the **gear icon** (Settings) on the agent and update the **Schema name** to include your UserID. For example, if your username is `user.xibbqhpx`, set the schema name to include `xibbqhpx`.
 
     > [!IMPORTANT]
     > You **must** update the schema name to include your UserID. If you do not set a unique schema name, your pipeline deployment to the ALM Prod environment will fail later. A unique schema name is required to build a pipeline to a shared ALM Prod environment.
@@ -389,9 +408,10 @@ Create a deployment pipeline that automates solution deployment across environme
 
 #### Set Up Deployment Stage
 
-1. Select the **ALM Prod** environment as the **Target environment**.
-
-1. **Save** the pipeline configuration.
+1. In the pipeline editor, select **+ New deployment stage** (or use the default stage).
+1. Enter a **Stage name** (for example, `Prod`).
+1. For **Target environment**, select **ALM Prod**.
+1. Select **Save** to save the pipeline configuration.
 
 #### Test Your Pipeline
 

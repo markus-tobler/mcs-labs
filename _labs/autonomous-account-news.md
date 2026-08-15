@@ -1,8 +1,9 @@
 ---
+module: autonomous-agents
 title: "Build an Autonomous Account News Assistant Agent"
 description: "Empower sellers with timely insights – Build an autonomous Copilot Studio agent that periodically scans your Sales App for high-value opportunities, finds related news, and sends curated reports."
 order: 22
-duration: 60
+duration: 30
 difficulty: 200
 section: advanced_labs
 journeys: ["autonomous-ai", "developer"]
@@ -93,6 +94,7 @@ This proactive approach helps account teams stay ahead of client developments an
 - Access to Microsoft Copilot Studio
 - Sales App instance with active opportunities
 - Access to Microsoft 365 email connector (Outlook)
+- A Dataverse (Microsoft Dataverse / Dynamics 365) OAuth connection, with permission to read Opportunity records in the workshop environment
 - Familiarity with Power Automate for recurring triggers
 - Basic understanding of Generative Orchestration in Copilot Studio
 
@@ -142,22 +144,27 @@ Set up an autonomous agent with a recurring trigger that automatically activates
 
 **Creating the Agent and Solution Setup**
 
-  1. Go to the Copilot Studio home page at [Copilot Studio](https://copilotstudio.microsoft.com).  Confirm you are using your DEV enviornment.
+  1. Go to the Copilot Studio home page at [Copilot Studio](https://copilotstudio.microsoft.com).  Confirm you are using your DEV environment.
 
   1. Select **Agents** in the left navigation.
 
-  1. Select **Create agent from blank** in upper right corner.
+  1. From the Agents list, select the down-arrow (chevron) next to **New Agent**, then choose **New classic agent**.
 
-  1. Select **Edit** in the Details section and change  the Name to `Account News Assistant` and then select **Save**.
+  1. In the **Name your agent** dialog that opens, enter `Account News Assistant` in the **Enter agent name** textbox and select **Create**.
+
+      ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+      > [!NOTE]
+      > Keep the **New experience** toggle ON — **New classic agent** opens the classic canvas in a new browser tab without switching experiences. A one-time **Welcome to Microsoft Copilot Studio** consent dialog may appear on first sign-in (select **Get Started**; if it stacks behind the **Name your agent** dialog, Cancel, Get Started, then retry).
 
 #### Adding a Recurring Trigger
 
 1.  In the agent's **Overview** tab, scroll to the **Triggers** section.
 
-  > [!TIP]
+  > [!IMPORTANT]
   > The triggers section may not be immediately available as it depends on background processes started when the agent is created.  This should take no more than a minute to complete.
 
-  1.  Select **Add a new Trigger** and select **Recurrence** and then select **Next**
+  1.  Select **Add trigger**, select **Recurrence**, and then select **Next**
 
   > [!TIP]
   > Please be aware that the triggers wizard can take a few moments to move between screens.
@@ -202,13 +209,13 @@ Set up an autonomous agent with a recurring trigger that automatically activates
 
 #### Step-by-step instructions
 
-1. Go to **Tools** in the top-level menu.
+1. Go to the agent's **Tools** tab (in the agent's top tab strip alongside Overview, Knowledge, Topics, etc.).
 
 1. Select **+ Add a tool**.
 
-1. Search and select `List rows from selected environment`.
+1. Search for `List rows` and select the **List rows from selected environment** action (under **Microsoft Dataverse**, displayed as *List rows from a table in a Power Platform environment*).
 
-1. Choose an existing Dataverse connection or add a new one (select Oauth as authentication type).
+1. Select an existing Dataverse connection or add a new one (select OAuth as authentication type).
 
     > [!IMPORTANT]  
     > If you need to create the connection use OAuth and sign in with your workshop credentials. Your user requires permission to access Opportunity records, which is provided as part of the workshop.
@@ -238,7 +245,7 @@ Set up an autonomous agent with a recurring trigger that automatically activates
       - **Value**: `Opportunities`
   
      Select **Add input** and select **Filter rows**.
-     - **Fill using**: `Set a custom value`.
+     - **Fill using**: `Custom value`.
      - **Value**: 
 
         ```
@@ -281,7 +288,7 @@ Set up an autonomous agent with a recurring trigger that automatically activates
 
 1. In the left menu, select **Generative AI**.
 
-1. Turn **On** the toggle for **Deep Reasoning**.
+1. Turn **On** the toggle for **Deep reasoning (preview)**.
 
     > [!TIP]
     > Deep reasoning is currently unavailable in the UI in certain regions.  If you do not see the Deep Reasoning toggle in the settings area, try accessing the agent via https://copilotstudio.preview.microsoft.com
@@ -438,8 +445,6 @@ Set up an autonomous agent with a recurring trigger that automatically activates
 
   1. Select **Save**
 
-  1. You can copy and paste the YAML content below into your agent using the code editor. 
-
 > [!TIP]  
 > You can also copy and paste the YAML content below into your agent using the code editor. 
 > 
@@ -469,7 +474,7 @@ Set up an autonomous agent with a recurring trigger that automatically activates
 > 
 > inputType:
 >   properties:
->     searchResults:
+>     relevantNewsForOpportunities:
 >       displayName: relevantNewsForOpportunities
 >       description: |-
 >         A JSON representing opportunity IDs, search responses for each opportunity, with citation names and URLs, and an explanation regarding the relevance of search response to the opportunity
@@ -498,9 +503,9 @@ Set up an autonomous agent with a recurring trigger that automatically activates
   5. Use Log relevant news for opportunities to log your findings. The base input for Log relevant news for opportunities should be {Global.globalSearchResults} with determined relevance added
   ```
 
-  1 To increase orchestration accuracy, you will now replace names of topics, tools and variables with references. References can be added to instructions by typing **/** and selecting the appropriate object from the drop-down menu.
+  1. To increase orchestration accuracy, you will now replace names of topics, tools and variables with references. References can be added to instructions by typing **/** and selecting the appropriate object from the drop-down menu.
 
-  1. In the instructions, select `<Get Opportunity records>`. Type **/** and in the drop-down menu, under **Tool**, select **Get Opportunity records**. The previous text in curly brackets should be replaced by a visual reference to the tool.
+  1. In the instructions, select `<Get Opportunity records>`. Type **/** and in the drop-down menu, under **Tool**, select **Get Opportunity records**. The previous text in angle brackets should be replaced by a visual reference to the tool.
 
 1. Repeat the same action for the topic `<Log Search Results>`. Type **/** and in the drop-down menu, under **Topic**, select **Log Search Results** to insert a visual reference to the topic, replacing `<Log Search Results>`.
 
@@ -666,11 +671,11 @@ Automate the final step: format relevant news into a clean, branded email for ac
 
 1. Select **Insert**.
 
-1. Save the **Conversation start** topic
+1. Save the **Conversation start** topic.
 
 1. Now that your agent has a preloaded HTML template, configure an Outlook email tool to deliver the report.
 
-1. Go to **Tools** in the top-level menu.
+1. Go to the agent's **Tools** tab (in the agent's top tab strip alongside Overview, Knowledge, Topics, etc.).
 
 1. Select **+ Add a tool**.
 
@@ -703,7 +708,7 @@ Automate the final step: format relevant news into a clean, branded email for ac
 
 1. Now that you've created the report template and configured the email tool, you'll guide the agent to use them as part of its orchestration.
 
-1. Go to your agent and go to the **Overview** tab.
+1. Go to your agent and select the **Overview** tab.
 
 1. In the **Instructions** section, add the following steps:
 
@@ -723,7 +728,7 @@ Automate the final step: format relevant news into a clean, branded email for ac
 1. **Save** your agent's instructions. The instructions should appear as follows:
     ![Instructions After Topics](images/final-instructions.png)
 
-1. Go to the **Triggers** section and Select **Test trigger** on the `Analyze Opportunities` trigger.
+1. Go to the **Triggers** section and select **Test trigger** on the `Analyze Opportunities` trigger.
 
 1. Once the agent finishes executing, verify:
    - It retrieved opportunities from the Sales App

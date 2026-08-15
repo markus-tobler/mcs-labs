@@ -1,5 +1,6 @@
 ---
 layout: lab
+module: multi-agent
 title: "Using Multi-Agent in Copilot Studio"
 order: 250
 duration: 30
@@ -168,35 +169,50 @@ Create the parent agent base that will be needed to host all your tools, agents,
 
 1. Check the **Environment** in the upper right corner to make sure you are in your "DEV - user name" environment.
 
-1. On the Home page in the description of the agent you want to build, enter the following but do not select enter yet: 
+1. In the left navigation, select **Agents**.
+
+1. From the Agents list, select the **down-arrow (chevron)** next to **New Agent**, then choose **New classic agent**.
+
+    ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+    > [!NOTE]
+    > Leave the **New experience** toggle **on**. **New classic agent** opens the classic authoring canvas in a new tab without switching experiences — there's no need to flip experiences. On a first sign-in you may see a one-time **Welcome to Microsoft Copilot Studio** consent dialog; select **Get Started** to dismiss it. (If it later appears stacked *behind* the **Name your agent** dialog, select **Cancel** on that dialog, choose **Get Started**, then create the agent again.)
+
+1. In the **Name your agent** dialog, enter the following name and select **Create**:
 
     ```text
-    Agent that assists sales associates with getting product information and lookup account and contact information in the sales system.
+    Sales Associate Assistant
     ```
 
-    > [!IMPORTANT]
-    > Do not Select Enter or submit this text yet as we need to do the agent settings before we do that.
-
-    ![Home Creation Text](images/image.png)
-
-1. Select the **Gear** on the description input area and edit the schema name to include `salesassistant` and then Select **Update**. 
-
-    ![Agent Settings](images/image-1.png)
+1. Wait for the **"Your agent has been provisioned."** notification. Your agent opens on its **Overview** page.
 
     > [!TIP]
-    > Putting an agent into a dedicated solution and changing the schema name is always helpful for application lifecycle management in the future.
+    > Putting an agent into a dedicated solution and changing the schema name is always helpful for application lifecycle management in the future. You can set the schema name from the agent's **Settings** once it's created.
 
-1. Select **Enter** or the **Arrow** button on the right side of the description field.
+1. A new classic agent starts **blank** — empty Instructions, default system topics, and the model defaults to **Claude Sonnet 4.6**. In the **Instructions** section, select **Edit**, paste the following, and save:
 
-1. Once your agent is fully provisioned, review the instructions and tool or knowledge recommendations provided by the Copilot Studio provisioning process.
+    ```text
+    You are the Sales Associate Assistant. Your purpose is to help sales associates quickly find product information and look up account and contact information in the sales system.
+
+    Guidelines:
+    - Help sales associates get market-specific product information and answer account and contact questions.
+    - Only use the knowledge, tools, and connected or child agents configured on this agent. Do not rely on general model knowledge or the web.
+    - Ask the user which market they are working in when it is needed to scope product information.
+    - Delegate account and contact lookups to the connected account and contact agent.
+    - Keep responses concise, accurate, and grounded in the sources you are given.
+    - If you don't have the information, say so rather than guessing.
+    ```
+
+    > [!NOTE]
+    > Earlier versions of this lab created the parent agent with a describe-driven flow that auto-generated these Instructions. A new classic agent starts blank, so you provide the Instructions here. Feel free to refine the wording for your scenario.
 
 #### Prevent Hallucinations
 
 1. To make sure that our agent doesn't use model knowledge, we want to turn off some features. Select **Settings** in the upper right corner.
 
-1. Scroll to the bottom of the list of settings on the **Generative AI** settings screen and turn **Off** both **Use general knowledge** and **Use information from the Web**.
+1. Scroll to the bottom of the list of settings on the **Generative AI** settings screen and turn **Off** both **Allow ungrounded responses** and **Use information from the Web**.
 
-    ![Turn off Model and Web Knowledge](images/image-2.png)
+    ![Turn off ungrounded responses and Web Knowledge](images/image-2.png)
 
 1. Select **Save** and then select the **X** in the upper right corner of the settings page to close it.
 
@@ -296,7 +312,15 @@ In this section, you'll learn how to create child agents to logically group know
 
 **Scenario:** You want to orchestrate to knowledge about your products based upon the market that the user selects.
 
-### Create Child Agent for US product information
+### Objective
+
+Create two child agents that provide market-specific Surface product information, gated by the Market variable set in Use Case #1.
+
+---
+
+### Step-by-step instructions
+
+#### Create Child Agent for US product information
 
 1. In the Sales Associate Assistant, select **Agents** on the top navigation menu.
 
@@ -492,7 +516,7 @@ Confirm the environment is ready to host a connected agent for account and conta
 1. Select **Quick Find Active Accounts** option from the list of Views
 
 1. Select **View Column** to verify the following list of columns are in the view, you may have to scroll to see all of the included columns:
-   - Address1: State or Providence
+   - Address 1: State/Province
    - Address1: Postal Code
    - Address1: City
    - Annual Revenue
@@ -503,7 +527,7 @@ Confirm the environment is ready to host a connected agent for account and conta
     ![Account View](images/image-20.png)
 
 1. Add the ability to search on certain fields by making sure that the following items are in the **Find by** on the bottom right. Select the **Edit find table columns** option to check:
-   - Address1: State or Providence
+   - Address 1: State/Province
    - Address1: Postal Code
    - Address1: City
 

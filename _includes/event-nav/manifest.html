@@ -14,13 +14,15 @@
 {%- endcomment -%}
 <script type="application/json" id="mcs-events-manifest">
 [
+{%- assign all_deliveries = site.events | concat: site.workshops -%}
 {%- assign event_sep = "" -%}
-{%- for event in site.events -%}
+{%- for event in all_deliveries -%}
 {{ event_sep }}
   {
     "event_id": {{ event.event_id | jsonify }},
     "title": {{ event.title | jsonify }},
     "url": {{ event.url | relative_url | jsonify }},
+    "kind": {% if event.collection == "workshops" %}"workshop"{% else %}"event"{% endif %},
     "schedule": [
       {%- assign agenda = site.data.agendas[event.event_id] -%}
       {%- assign item_sep = "" -%}
@@ -39,6 +41,23 @@
                 "title": {{ display_title | jsonify }},
                 "difficulty": {{ lab.difficulty | default: 0 | jsonify }},
                 "duration": {{ item.duration | default: lab.duration | default: 0 }}
+                {%- if item.time %}, "time": {{ item.time | jsonify }}{% endif -%}
+              }
+              {%- assign item_sep = "," -%}
+            {%- endif -%}
+          {%- elsif item.type == "module" -%}
+            {%- assign mod = site.modules | where: "slug", item.slug | first -%}
+            {%- if mod -%}
+              {%- assign display_title = item.title | default: mod.title -%}
+              {{ item_sep }}
+              {
+                "type": "module",
+                "slug": {{ item.slug | jsonify }},
+                "label": {{ item.label | default: "" | jsonify }},
+                "url": {{ mod.url | relative_url | jsonify }},
+                "title": {{ display_title | jsonify }},
+                "difficulty": {{ mod.difficulty | default: 0 | jsonify }},
+                "duration": {{ item.duration | default: mod.duration | default: 0 }}
                 {%- if item.time %}, "time": {{ item.time | jsonify }}{% endif -%}
               }
               {%- assign item_sep = "," -%}
@@ -84,6 +103,7 @@
 </script>
 <script type="application/json" id="mcs-lab-context">
 {
+  "type": {% if page.collection == "modules" %}"module"{% else %}"lab"{% endif %},
   "slug": {{ page.slug | jsonify }},
   "title": {{ page.title | jsonify }},
   "url": {{ page.url | relative_url | jsonify }}

@@ -1,5 +1,6 @@
 ---
 layout: lab
+module: component-collections
 title: "Using Component Collections in Copilot Studio"
 order: 260
 duration: 45
@@ -94,6 +95,7 @@ This lab teaches you how to create component collections, share them across agen
 
 - Access to Microsoft Copilot Studio
 - Permissions to create agents and modify settings in your environment
+- The **Corporate Services** managed solution that Use Case #3 depends on has already been imported into your lab environment as part of the lab preparation — you do **not** need to import it yourself. For reference, the source file lives at [corporateServices_1733752691034_1_1_managed.zip](https://github.com/microsoft/mcs-labs/raw/main/labs/component-collections/corporateServices_1733752691034_1_1_managed.zip) in the lab assets, and you can confirm it is installed by opening the Power Apps maker portal at [https://make.powerapps.com](https://make.powerapps.com) and looking for the **Corporate Services** solution under **Solutions**.
 
 ---
 
@@ -106,6 +108,7 @@ In this lab, you'll create a component collection from an existing agent and lea
 - Add a component collection to a different agent and verify shared access
 - Edit a shared component and confirm changes sync across agents
 - Manage component collection ownership by setting a primary agent
+- Understand how managed component collections behave as read-only in consuming agents
 - Understand how component collections integrate with Power Platform solutions
 
 ---
@@ -150,7 +153,16 @@ Create an agent, build a custom topic, and package components into a reusable co
 
 1. Go to the Copilot Studio home page at <a href="https://copilotstudio.microsoft.com" target="_blank">copilotstudio.microsoft.com</a>.
 
-1. Select **Agents** on the left navigation.
+1. At the top of the page, turn **off** the **New experience** toggle to return to the previous (classic) experience. The **Start with an agent template** gallery used in this lab is only available in the classic experience.
+
+    ![The New experience toggle, shown switched on](images/new-experience-toggle.png)
+
+    > [!NOTE]
+    > When you turn the toggle off, a **Submit feedback to Microsoft** dialog appears. Select a reason (for example, **I'm missing a feature I need**), optionally add a comment, then select **Submit** and **Done**. Selecting **Cancel** keeps you in the new experience. The page then reloads into the classic experience.
+    >
+    > ![The Submit feedback dialog shown when switching back to the classic experience](images/switch-back-feedback-dialog.png)
+
+1. Select **Agents** on the top navigation.
 
 1. Scroll down to the **Start with an agent template** section.
 
@@ -159,6 +171,12 @@ Create an agent, build a custom topic, and package components into a reusable co
 1. Select the **Safe Travels** template.
 
 1. Select **Create** to make the agent.
+
+1. After the agent is created, return to the new experience: select **Home** in the top navigation, then select **Try now** on the **New Copilot Studio experience** banner. The page switches back to the new experience.
+
+    ![The New Copilot Studio experience banner with the Try now button](images/switch-back-try-now-banner.png)
+
+1. Select **Agents** in the left navigation and open your new **Safe Travels** agent to continue.
 
 #### Create a Sample Topic
 
@@ -190,7 +208,7 @@ Create an agent, build a custom topic, and package components into a reusable co
 
 1. Select **Create** on the Create a component collection screen.
 
-1. Enter **Travel Tools**  into the **Name** field
+1. Enter **Travel Tools** into the **Name** field.
 
 1. Enter the following into the **Description** field:
 
@@ -198,10 +216,10 @@ Create an agent, build a custom topic, and package components into a reusable co
     These are tools that assist with travel related scenarios.
     ```
 
-1. Check the **Solution** field, if **Select a solution** is showing do not change anything, if a solution is selected change it to **Create a new solution**.
+1. Leave the **Solution** field unselected so Copilot Studio creates a new solution for you. (Helper text below the field reads: *If no solution is selected, one will automatically be created for you.*) If a solution is already selected, click the X next to it to clear it before continuing.
 
     > [!NOTE]
-    > If the Solution field is left blank, Copilot Studio will automatically create a new solution for you. You can also select an existing solution if you want to group multiple component collections together.
+    > When the Solution field is left blank, Copilot Studio automatically creates a new solution for you. You can also select an existing solution if you want to group multiple component collections together.
 
 1. Select **Next**.
 
@@ -274,9 +292,14 @@ Install a component collection in a new agent and verify that shared editing wor
 
 1. Select **Agents** on the left navigation menu.
 
-1. Select the **Create blank agent** button in the upper right corner.
+1. From the Agents list, select the down-arrow (chevron) next to **New Agent**, then choose **New classic agent**. In the **Name your agent** dialog, enter `Travel Hub` and select **Create**.
 
-1. This will create a blank agent. Wait for it to be provisioned.
+    ![New Agent split-button menu showing New classic agent](images/new-agent-classic-menu.png)
+
+    > [!NOTE]
+    > Keep the **New experience** toggle ON — **New classic agent** opens the classic canvas in a new browser tab without switching experiences. On a first sign-in, a one-time **Welcome to Microsoft Copilot Studio** consent dialog may appear (select **Get Started**; if it stacks behind the **Name your agent** dialog, select Cancel, then Get Started, then create again).
+
+1. Wait for the agent to be provisioned.
 
 1. Once provisioned, go to **Settings** in the upper right corner.
 
@@ -284,11 +307,11 @@ Install a component collection in a new agent and verify that shared editing wor
 
 1. In the **Manage component collections** menu, select the **Available** tab.
 
-1. Hover over the **Travel Tools** item in the list, Select the **...** menu, and select **Add to agent**. This adds the Travel Tools component collection to your new agent.
+1. Select the **Travel Tools** item in the list to open its details page. In the **Connected agents** section in the upper right, select **Add agent**, choose your new agent, and select **Add**.
 
     ![A screenshot showing available component collections as mentioned in the text](images/available%20component%20collections.png)
 
-1. Go to the **Installed** tab in the menu. Notice that **Travel Tools** is now listed as installed in both your new agent and the Safe Travels agent.
+1. Use the **Back** link to return to the component collections list, then go to the **Installed** tab. Notice that **Travel Tools** is now listed as installed in both your new agent and the Safe Travels agent.
 
 1. Close the Settings menu by selecting the **X** in the upper right corner.
 
@@ -316,7 +339,7 @@ Install a component collection in a new agent and verify that shared editing wor
 
 1. Go to the **Request a travel brochure** topic and Select it to open it.
 
-1. You may need to refresh your browser, but you will see that the edit you made in the other agent is now reflected here as well.
+1. The edit will sync to other connected agents that share the collection. You may need to refresh your browser, and in some cases sync can take several minutes to propagate. If you don't see the change immediately, wait a few minutes and refresh again.
 
     > [!IMPORTANT]
     > This is the key value of component collections - changes made in any connected agent are automatically synced to all other agents that share the same collection. This eliminates the need to manually update components in multiple places.
@@ -390,7 +413,7 @@ Manage component collection access, set a primary agent, and explore solution in
 
 1. In the **Agents** navigation menu on the left, select the **Safe Travels** agent.
 
-1. Go to **Topics** on the top menu and then select **Request Product Info**.
+1. Go to **Topics** on the top menu and then select a topic from the **Corporate Services** collection (for example, **Request Product Info**).
 
 1. Notice that you can't make any changes as the component collection that installed it is managed.
 
@@ -414,7 +437,7 @@ Manage component collection access, set a primary agent, and explore solution in
 
 #### Explore Solution Awareness
 
-1. In the **Details** section, Select **View Solution** (Travel Tools Solution).
+1. In the **Details** section, select the **View Solution** link next to the auto-generated solution (for example, **Travel Tools**).
 
 1. This will let you inspect the details of the solution in Power Platform, as component collections are solution-aware.
 
