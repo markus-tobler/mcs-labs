@@ -90,7 +90,7 @@ This example is covered in **Use Case 1** of this lab. It establishes the founda
 - A **Power Platform environment** where you can edit Dataverse table data and toggle environment settings (System Administrator or System Customizer).
 - **Sample data pre-loaded** into the Dataverse tables used by the order-management use cases ("Tasks" table).
 - Permission to create connections for the services used across the lab: **Microsoft To-Do (Business)**, **Office 365 Outlook**, **Work IQ Mail**, **Microsoft Dataverse / Dataverse MCP**, Human Review, and **Microsoft 365 Copilot**.
-- The **Dataverse connection reference** in the pre-loaded **LAB: Account Lookup Agent** solution repointed to a connection you own — see [Dataverse connection reference — do this first](#dataverse-connection-reference--do-this-first). **Every Dataverse tool in this lab fails silently without it.**
+- The **Dataverse connection reference** in the pre-loaded **AccountLookupAgent** solution repointed to a connection you own — see [Dataverse connection reference — do this first](#dataverse-connection-reference--do-this-first). **Every Dataverse tool in this lab fails silently without it.**
 - Basic familiarity with the Copilot Studio interface.
 - The **Warehouse MCP** custom MCP server imported into your environment — see [Custom MCP servers](#custom-mcp-servers) below. **Use Case #4 cannot be completed without it.**
 - The **LAB: Order Management Workflows** solution **imported by you** — your environment does not ship with it, and you must own the workflow to publish it. See [The Order Management solution](#the-order-management-solution) below. **Use Cases #2–#5 fail without this.**
@@ -100,14 +100,16 @@ This example is covered in **Use Case 1** of this lab. It establishes the founda
 
 #### Dataverse connection reference — do this first
 
-**Do this before anything else in the lab.** Your environment ships with the **LAB: Account Lookup Agent** solution, and the Dataverse connection reference inside it is owned by the workshop author, not by you — it arrives with **Owner** set to someone else and **Status: Off**. Until you point it at a connection of your own, anything that reaches Dataverse fails, and it fails quietly: the tool shows a healthy connection but lists no operations, and an agent that needs it will report that the Dataverse connector is "not available as a tool" rather than erroring.
+**Do this before anything else in the lab.** Your environment ships with the **AccountLookupAgent** solution, and the Dataverse connection reference inside it is owned by the workshop author, not by you — it arrives with **Owner** set to someone else and **Status: Off**. Until you point it at a connection of your own, anything that reaches Dataverse fails, and it fails quietly: the tool shows a healthy connection but lists no operations, and an agent that needs it will report that the Dataverse connector is "not available as a tool" rather than erroring.
 
 > [!NOTE]
 > **Already did this in another lab in this event?** You do not need to repeat it — the fix is per environment, not per lab. Come back to this section only if a Dataverse tool starts misbehaving: no rows returned, a tool that lists no operations, or an agent that says it cannot reach Dataverse.
 
 1. Go to [make.powerapps.com](https://make.powerapps.com) and confirm the **environment picker** in the top right names your **DEV - User <your ID>** environment.
 
-1. Select **Solutions**, open **LAB: Account Lookup Agent**, then select **Connection references** in the left pane. There is exactly one, named `copilots_header_cref7_LookupDataAgent.shared_commondataserviceforapps.…`. Note its **Owner** — it will not be you.
+1. Select **Solutions**, open **AccountLookupAgent**, then select **Connection references** in the left pane. There is exactly one, named `copilots_header_cref7_LookupDataAgent.shared_commondataserviceforapps.…`. Note its **Owner** — it will not be you.
+
+   ![Selecting the AccountLookupAgent solution in Power Apps](images/select-account-lookup-agent.png)
 
 1. Tick the row's checkbox and choose **Edit** on the command bar.
 
@@ -505,9 +507,13 @@ Complete the setup of the **Order Management Workflow**: configure all solution 
    > [!TIP]
    > **Improving classification accuracy:** You can add multiple examples to each category to handle different phrasings and edge cases. For instance, a "Quote Request" might come as *"Can you send me pricing for 500 units?"* or *"We'd like a formal quotation for the attached spec."* Adding diverse examples helps the model generalize better. A good testing exercise is to try common cases **and** edge cases using the **Test** tab in the Classify node, observe how categories get assigned, and refine the category descriptions accordingly.
 
+8. Select the **Archive email** node on the **Other** branch and confirm the **Folder** value. Depending on your Outlook language, the archive folder may use a localized name, such as **Archiv** instead of **Archive**. If needed, open the folder picker and double-click the localized archive folder so the action points to the right mailbox folder.
+
+   ![Changing the Archive email folder value for a localized Outlook mailbox](images/activity-uc2-change-e-mail-folder.png)
+
 #### Test the classification
 
-8. Test the classification before sending a real email. In the **When a new email arrives** section, find **Body** (*The body of the message*), click into the box, and paste:
+9. Test the classification before sending a real email. In the **When a new email arrives** section, find **Body** (*The body of the message*), click into the box, and paste:
 
    ```
    Hi, I would like to request a quote for 500 units of Product A.
@@ -519,7 +525,7 @@ Complete the setup of the **Order Management Workflow**: configure all solution 
 
 #### Test the "Other" classification path end-to-end
 
-9. Open **Outlook** ([outlook.office.com](https://outlook.office.com)) and compose a new email **to your lab user account** with the following:
+10. Open **Outlook** ([outlook.office.com](https://outlook.office.com)) and compose a new email **to your lab user account** with the following:
 
    - **Subject:** `Order Management - Congratulations! Your order desk has been selected`
    - **Body:**
@@ -547,7 +553,7 @@ Complete the setup of the **Order Management Workflow**: configure all solution 
 
    ![Composing the test email in Outlook](images/test-other-email-compose.png)
 
-10. Wait a **few seconds** for the workflow to trigger and process the email. Then navigate to your **Archive** folder in Outlook. You should see the test email has been automatically moved there — confirming the "Other" classification path is working correctly.
+11. Wait a **few seconds** for the workflow to trigger and process the email. Then navigate to your **Archive** folder in Outlook. You should see the test email has been automatically moved there — confirming the "Other" classification path is working correctly.
 
    > [!TIP]
    > If the email doesn't appear in the Archive folder, check the **Activity** tab in the workflow in Copilot Studio to see if the run triggered. If no run appears, verify the workflow is **Published** (not Draft) and that the email subject includes "Order Management."
@@ -703,12 +709,12 @@ Build and validate the **Supplier Delay** path of the **Order Management Workflo
 4. Under **Tools**, navigate to **Model Context Protocol** (**MCP servers**), then add and connect both of these tools:
 
    - **Microsoft Dataverse MCP Server**
-   - **Warehouse and Fulfillment MCP**
+   - **Warehouse MCP**
 
    Sign in or connect as prompted so both tools show as available in the agent.
 
     > [!WARNING]
-    > The server is listed as **Warehouse and Fulfillment MCP**, not "Warehouse MCP" — searching for the shorter name returns nothing. It appears only under the **Model Context Protocol (MCP)** tab of the tool picker; the **All** tab returns unrelated connector actions.
+    > **Warehouse MCP** appears only under the **Model Context Protocol (MCP)** tab of the tool picker; the **All** tab returns unrelated connector actions.
 
     > [!IMPORTANT]
     > **If a tool's panel says "No tools found", remove the tool and add it again.** Open the tool and look at its **Tools / Inputs** list, not just its **Connection** — an MCP server can show a perfectly valid connection while exposing no operations at all. When that happens the agent runs, reasons, and reports that the connector is "not available as a tool" instead of failing, so the run succeeds while doing nothing. Re-creating the connection does **not** fix it. Removing the tool from the agent and re-adding it from the **Model Context Protocol (MCP)** tab does. After re-adding, the button becomes **Save and publish** — plain **Publish** leaves the change unsaved.
