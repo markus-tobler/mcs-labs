@@ -93,16 +93,21 @@ Finally, you will build a second agent, **Company Researcher**, upload the gener
 - Access to [Microsoft Copilot Studio](https://copilotstudio.microsoft.com/) in an environment where you can create agents
 - Access to the **GitHub Copilot harness** agent experience
 - A work or school account with an Exchange Online mailbox, and permission to create or use an **Office 365 Outlook** connection
-- The following packages from the supplied lab artifacts:
-  - **Skill Creator**
-  - **Agent Harness Explorer**
+- The following skill packages, bundled with this lab under [`assets`](assets):
+
+  | Package                                                              | Skill                     | Purpose                                                              |
+  | --------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------- |
+  | [`skill-creator.zip`](assets/skill-creator.zip)                     | **Skill Creator**         | Provides the process for creating a new skill                       |
+  | [`agent-harness-explorer.zip`](assets/agent-harness-explorer.zip)   | **Agent Harness Explorer** | Identifies what the target harness can support before designing a skill |
+
+  Download the **raw** file for each — GitHub's file preview will not give you a usable archive, and a `.zip` your browser has helpfully unpacked will not import.
 - Approval to use open web search and mail capabilities under your organization's data policies
 
 > [!IMPORTANT]
 > Skills, Model selection, and Memory in this lab use the GitHub Copilot harness. Building and testing these agents can consume Copilot Credits.
 
 > [!NOTE]
-> The two skill packages were supplied as lab artifacts in the recorded demonstration. Confirm that you have both packages before starting. A ZIP package must contain a `SKILL.md` file; a standalone Markdown skill must contain YAML front matter with a name and description, followed by its instructions.
+> The two skill packages ship with this lab as ready-to-upload ZIP packages. Confirm that you have downloaded both before starting. A ZIP package must contain a `SKILL.md` file; a standalone Markdown skill must contain YAML front matter with a name and description, followed by its instructions.
 
 ---
 
@@ -169,9 +174,9 @@ Prepare an agent that understands both how to create a skill and how to inspect 
 
    ![The Add skill dialog with Upload a skill selected](images/upload-skill-dialog.jpg)
 
-9. Drag the supplied **Skill Creator** file or package into the upload area, or select the upload area and browse to it.
+9. Download [`skill-creator.zip`](assets/skill-creator.zip), then drag it into the upload area, or select the upload area and browse to it.
 10. Wait for Copilot Studio to validate and add the skill.
-11. In **Skills**, select **+** again, choose **Upload a skill**, and upload **Agent Harness Explorer**.
+11. In **Skills**, select **+** again, choose **Upload a skill**, download [`agent-harness-explorer.zip`](assets/agent-harness-explorer.zip), and upload it.
 12. Wait until both skill chips appear in the **Skills** section.
 
 ![The Skill Creator agent with Agent Harness Explorer and Skill Creator installed](images/installed-skills.jpg)
