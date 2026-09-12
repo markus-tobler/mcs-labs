@@ -198,8 +198,8 @@ header:
 {% for lab in all_labs %}{% assign total_duration = total_duration | plus: lab.duration %}{% endfor %}
 {% assign total_hours = total_duration | divided_by: 60.0 | round: 1 %}
 {% assign levels = all_labs | map: "difficulty" | uniq %}
-{% assign all_events = site.events | sort: "order" %}
-{% assign all_workshops = site.workshops | sort: "order" %}
+{% assign all_events = site.events | where_exp: "e", "e.hidden != true" | sort: "order" %}
+{% assign all_workshops = site.workshops | where_exp: "w", "w.hidden != true" | sort: "order" %}
 {% assign all_modules = site.modules | sort: "order" %}
 
 <div class="home-hero">

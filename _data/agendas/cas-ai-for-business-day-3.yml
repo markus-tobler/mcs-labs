@@ -1,0 +1,89 @@
+event_id: cas-ai-for-business-day-3
+
+# CAS AI for Business — Day 3 of 5 (day 6 is an untracked hackathon day).
+# Source: _events/CAS_GenAI_2026_Tagesstruktur_V2.xlsx ("Übersicht" + "Tag 3").
+#
+# Conventions:
+#   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
+#   * Lab labels follow the course numbering: 01-13 for the main track and
+#     C01/C04/C06 for the custom labs authored for this course.
+#   * Didactic principle (flipped classroom at lab level): each lab opens with
+#     a short instructor intro, participants then work through the lab, and a
+#     theory block follows to consolidate what they just built.
+#   * Lab 07 is a family of related Copilot Studio labs; 07a (multi-agent)
+#     and 07b (orchestration) run today, 07c/07d (workflows) follow on Day 4.
+#   * Lab 08 (deploy your own MCP server) has no page in _labs/ and is carried
+#     as a "link" row pointing at the microsoft/mcsmcp repository.
+#   * Backup/filler labs (not part of the timed schedule below): «Ask Me
+#     Anything» (ask-me-anything, two parts, ~45+55 min) and Proactive
+#     Contract Alerts (contract-alerts-azure-ai, ~40 min). Use them to fill
+#     gaps that open up in Block 1.
+
+schedule:
+  - type: session
+    title: "Recap Day 2, open questions"
+    time: "08:30"
+    duration: 15
+
+  - type: lab
+    slug: mcs-multi-agent
+    label: "Lab 07a"
+    title: "Multi-Agent in Copilot Studio"
+    time: "08:45"
+    duration: 40
+
+  - type: session
+    title: "Theory: Multi-agent architecture in depth, transition to autonomous agents"
+    time: "09:25"
+    duration: 40
+
+  - type: lab
+    slug: mcs-orchestration
+    label: "Lab 07b"
+    title: "Orchestration — Improve Agent with Instructions"
+    time: "10:05"
+    duration: 40
+
+  - type: break
+    title: "Coffee break"
+    time: "10:45"
+    duration: 15
+
+  - type: lab
+    slug: workflow-email-triage
+    label: "Lab C06"
+    title: "Workflow-Based Email Triage"
+    time: "11:00"
+    duration: 60
+
+  - type: break
+    title: "Lunch break"
+    time: "12:00"
+    duration: 45
+
+  - type: session
+    title: "Theory: Use case development"
+    time: "12:45"
+    duration: 10
+
+  - type: session
+    title: "Hackathon prep 3: Job design"
+    time: "12:55"
+    duration: 50
+
+  - type: break
+    title: "Coffee break"
+    time: "13:45"
+    duration: 15
+
+  - type: link
+    title: "Lab 08 — Deploy your own MCP server"
+    url: "https://github.com/microsoft/mcsmcp"
+    description: "Deploy a custom MCP server and integrate it with Microsoft Copilot Studio for streamlined deployment and management."
+    time: "14:00"
+    duration: 40
+
+  - type: session
+    title: "Wrap-up Block 1, bridge to Block 2"
+    time: "14:40"
+    duration: 30

@@ -3,6 +3,7 @@ title: "Azure AI Workshop"
 description: "Comprehensive hands-on workshop combining Microsoft Copilot Studio with Azure AI services for building intelligent, enterprise-grade AI solutions."
 event_id: azure-ai-workshop
 order: 2
+hidden: true
 labs:
   - slug: dataverse-mcp-connector
     label: "Lab 1"

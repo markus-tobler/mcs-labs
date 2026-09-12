@@ -1,0 +1,108 @@
+event_id: cas-ai-for-business-day-1
+
+# CAS AI for Business — Day 1 of 5 (day 6 is an untracked hackathon day).
+# Source: _events/CAS_GenAI_2026_Tagesstruktur_V2.xlsx ("Übersicht" + "Tag 1").
+#
+# Conventions:
+#   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
+#   * Lab labels follow the course numbering: 01-13 for the main track and
+#     C01/C04/C06 for the custom labs authored for this course.
+#   * Didactic principle (flipped classroom at lab level): each lab opens with
+#     a short instructor intro, participants then work through the lab, and a
+#     theory block follows to consolidate what they just built.
+#   * Lab 03 (Build Intelligent Agents — Knowledge Sources, Tools, Topics) is
+#     split into three chunks — 03a/03b here at the end of Day 1, 03c first
+#     thing on Day 2 — because it anchors the theory that follows across
+#     both days.
+
+schedule:
+  - type: session
+    title: "Welcome & introduction"
+    time: "08:30"
+    duration: 25
+
+  - type: session
+    title: "Quiz: Baseline knowledge check"
+    time: "08:55"
+    duration: 15
+
+  - type: session
+    title: "Lab 00: Access to the lab environment"
+    time: "09:10"
+    duration: 15
+
+  - type: session
+    title: "Mini lecture: The AI & agentic-AI landscape — what is an agent? (short version)"
+    time: "09:25"
+    duration: 30
+
+  - type: break
+    title: "Coffee break"
+    time: "09:55"
+    duration: 20
+
+  - type: lab
+    slug: agent-builder-m365
+    label: "Lab 01"
+    title: "Progressive AI Assistants"
+    time: "10:15"
+    duration: 40
+
+  - type: session
+    title: "Theory: The platform explained — Copilot Studio, Power Platform, M365 Copilot; declarative vs. custom agents"
+    time: "10:55"
+    duration: 20
+
+  - type: lab
+    slug: explore-power-platform
+    label: "Lab C01"
+    title: "Explore the Power Platform"
+    time: "11:15"
+    duration: 20
+
+  - type: break
+    title: "Lunch break"
+    time: "11:35"
+    duration: 45
+
+  - type: break
+    title: "Mandelbärli break"
+    description: "A short energiser with a Swiss treat."
+    time: "12:20"
+    duration: 5
+
+  - type: lab
+    slug: mbr-prep-sharepoint-agent
+    label: "Lab 02"
+    title: "Monthly Business Review Agent"
+    time: "12:25"
+    duration: 60
+
+  - type: lab
+    slug: core-concepts-agent-knowledge-tools
+    label: "Lab 03a"
+    title: "Build Intelligent Agents — Knowledge Sources, Tools, Topics (Part 1)"
+    time: "13:25"
+    duration: 40
+
+  - type: break
+    title: "Coffee break"
+    time: "14:05"
+    duration: 20
+
+  - type: lab
+    slug: core-concepts-agent-knowledge-tools
+    label: "Lab 03b"
+    title: "Build Intelligent Agents — Knowledge Sources, Tools, Topics (Part 2)"
+    time: "14:25"
+    duration: 20
+
+  - type: session
+    title: "Hackathon prep 1: Identify your use case"
+    time: "14:45"
+    duration: 45
+
+  - type: session
+    title: "Day 1 wrap-up"
+    time: "15:30"
+    duration: 15

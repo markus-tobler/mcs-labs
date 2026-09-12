@@ -1,0 +1,97 @@
+event_id: cas-ai-for-business-day-2
+
+# CAS AI for Business — Day 2 of 5 (day 6 is an untracked hackathon day).
+# Source: _events/CAS_GenAI_2026_Tagesstruktur_V2.xlsx ("Übersicht" + "Tag 2").
+#
+# Conventions:
+#   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
+#   * Lab labels follow the course numbering: 01-13 for the main track and
+#     C01/C04/C06 for the custom labs authored for this course.
+#   * Didactic principle (flipped classroom at lab level): each lab opens with
+#     a short instructor intro, participants then work through the lab, and a
+#     theory block follows to consolidate what they just built.
+#   * Lab 03c closes out the Build Intelligent Agents lab that started on
+#     Day 1 (03a/03b), anchoring the RAG/knowledge-sources theory that follows.
+#   * Backup/filler labs (not part of the timed schedule below): «Ask Me
+#     Anything» (ask-me-anything, two parts, ~45+55 min) and Proactive
+#     Contract Alerts (contract-alerts-azure-ai, ~40 min). Use them to fill
+#     gaps that open up in Block 1.
+
+schedule:
+  - type: session
+    title: "Recap Day 1, open questions"
+    time: "08:30"
+    duration: 15
+
+  - type: lab
+    slug: core-concepts-agent-knowledge-tools
+    label: "Lab 03c"
+    title: "Build Intelligent Agents — Knowledge Sources, Tools, Topics (Part 3)"
+    time: "08:45"
+    duration: 20
+
+  - type: session
+    title: "Theory: Agent architecture in Copilot Studio — knowledge sources and RAG fundamentals"
+    time: "09:05"
+    duration: 35
+
+  - type: lab
+    slug: core-concepts-variables-agents-channels
+    label: "Lab 04"
+    title: "Master Variables, Multi-Agent Architectures & Channel Deployment"
+    time: "09:40"
+    duration: 40
+
+  - type: break
+    title: "Coffee break"
+    time: "10:20"
+    duration: 20
+
+  - type: session
+    title: "Theory: Tools & topics, child-agent pattern, variables & conversation state, channel deployment"
+    time: "10:40"
+    duration: 30
+
+  - type: break
+    title: "Lunch break"
+    time: "11:10"
+    duration: 45
+
+  - type: lab
+    slug: dataverse-mcp-connector
+    label: "Lab 05"
+    title: "Dataverse MCP Connector"
+    time: "11:55"
+    duration: 50
+
+  - type: session
+    title: "Theory: MCP and A2A as standard protocols"
+    time: "12:45"
+    duration: 60
+
+  - type: break
+    title: "Coffee break"
+    time: "13:45"
+    duration: 20
+
+  - type: lab
+    slug: core-concepts-analytics-evaluations
+    label: "Lab 06"
+    title: "Analytics & Evaluation"
+    time: "14:05"
+    duration: 40
+
+  - type: session
+    title: "Theory: Evaluation"
+    time: "14:45"
+    duration: 15
+
+  - type: session
+    title: "Hackathon prep 2: Evaluation"
+    time: "15:00"
+    duration: 30
+
+  - type: session
+    title: "Day 2 wrap-up"
+    time: "15:30"
+    duration: 15
