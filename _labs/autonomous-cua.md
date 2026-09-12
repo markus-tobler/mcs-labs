@@ -239,7 +239,7 @@ Learn how to integrate and configure tools for desktop automation and email comm
 
 #### Testing the Computer use tool
 
-15. In the **Instructions** section, select the **Test** button on the right
+15. In the **Instructions** section, select the **Test directly** button on the right
 
 1. Add the sample value `44123BCD` and select **Test now**
 

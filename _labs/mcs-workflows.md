@@ -38,7 +38,7 @@ Build an **autonomous agent** in Microsoft Copilot Studio using **Workflows** �
 - [Instructions by Use Case](#instructions-by-use-case)
   - [Use Case #1: Automate Task Time-Blocking with a Workflow and an Inline Agent](#use-case-1-automate-task-time-blocking-with-a-workflow-and-an-inline-agent)
   - [Use Case #2: Setting Up the Order Management Workflow](#use-case-2-setting-up-the-order-management-workflow)
-  - [Use Case #3: Use M365 Copilot and Add a Human-in-the-Loop in Order Management](#use-case-3-use-m365-copilot-and-add-a-human-in-the-loop-in-order-management)
+  - [Use Case #3: Replace M365 Copilot with an Agent and Add a Human-in-the-Loop in Order Management](#use-case-3-replace-m365-copilot-with-an-agent-and-add-a-human-in-the-loop-in-order-management)
   - [Use Case #4: Build an Inline Agent for Inventory Management](#use-case-4-build-an-inline-agent-for-inventory-management)
   - [Use Case #5 (Bonus): Call a Price Quote Specialist Agent from a Workflow](#use-case-5-bonus-call-a-price-quote-specialist-agent-from-a-workflow)
 - [Summary of Learnings](#summary-of-learnings)
@@ -103,7 +103,7 @@ This example is covered in **Use Case 1** of this lab. It establishes the founda
 - A work or school **Microsoft 365 account** with **Outlook (calendar)** and **Microsoft To Do** provisioned — the inline agent reads and writes *this* account's calendar and tasks.
 - A **Power Platform environment** where you can edit Dataverse table data and toggle environment settings (System Administrator or System Customizer).
 - **Sample data pre-loaded** into the Dataverse tables used by the order-management use cases ("Tasks" table).
-- Permission to create connections for the services used across the lab: **Microsoft To-Do (Business)**, **Office 365 Outlook**, **Work IQ Mail**, **Microsoft Dataverse / Dataverse MCP**, Human Review, and **Microsoft 365 Copilot**.
+- Permission to create connections for the services used across the lab: **Microsoft To-Do (Business)**, **Office 365 Outlook**, **Work IQ Mail**, **Microsoft Dataverse / Dataverse MCP**, and Human Review. A **Microsoft 365 Copilot** licence is **not** required — Use Case #3 replaces the workflow's M365 Copilot node with an Agent node.
 - The **Dataverse connection reference** in the pre-loaded **AccountLookupAgent** solution repointed to a connection you own — see [Dataverse connection reference — do this first](#dataverse-connection-reference--do-this-first). **Every Dataverse tool in this lab fails silently without it.**
 - Basic familiarity with the Copilot Studio interface.
 - The **Warehouse MCP** custom MCP server imported into your environment — see [Custom MCP servers](#custom-mcp-servers) below. **Use Case #4 cannot be completed without it.**
@@ -266,7 +266,7 @@ In this lab, you'll build several autonomous Workflows that act on event-driven 
 
 - Create a **Workflow** and configure **manual, scheduled, and connector-based triggers**.
 - Embed a **non-deterministic inline agent** in a workflow, give it goal-oriented instructions, and reference earlier data with the **`/` dynamic-content token**.
-- Equip agents with **tools** across Microsoft 365 and Dataverse (Office 365 Outlook's **Find meeting times** and **Create event**, Update to-do, **Dataverse MCP**, web search) and use **M365 Copilot** inside a workflow.
+- Equip agents with **tools** across Microsoft 365 and Dataverse (Office 365 Outlook's **Find meeting times** and **Create event**, Update to-do, **Dataverse MCP**, web search), and **replace a licence-gated M365 Copilot node with an Agent node** that runs the same drafting prompt.
 - Add a **human-in-the-loop approval** step so a person validates an AI-drafted action before the workflow continues.
 - **Publish, run, and monitor** workflows end-to-end — including calling a separate **published agent** from a workflow branch.
 
@@ -278,7 +278,7 @@ In this lab, you'll build several autonomous Workflows that act on event-driven 
 |------|----------|-------------|--------|
 | 1 | [Automate Task Time-Blocking with a Workflow and an Inline Agent](#use-case-1-automate-task-time-blocking-with-a-workflow-and-an-inline-agent) | Build an autonomous, trigger-driven Workflow whose inline agent reasons over a task and acts across your calendar and to-do list | 15 min |
 | 2 | [Setting Up the Order Management Workflow](#use-case-2-setting-up-the-order-management-workflow) | Configure connections, ownership, and publish a pre-built multi-branch classification workflow | 15 min |
-| 3 | [Use M365 Copilot and Add a Human-in-the-Loop](#use-case-3-use-m365-copilot-and-add-a-human-in-the-loop-in-order-management) | Validate the Customer Inquiry path: M365 Copilot drafts a response, human approves, workflow replies | 15 min |
+| 3 | [Replace M365 Copilot with an Agent and Add a Human-in-the-Loop](#use-case-3-replace-m365-copilot-with-an-agent-and-add-a-human-in-the-loop-in-order-management) | Rebuild the Customer Inquiry path without an M365 Copilot licence: an Agent node drafts the response, human approves, workflow replies | 15 min |
 | 4 | [Build an Inline Agent for Inventory Management](#use-case-4-build-an-inline-agent-for-inventory-management) | Add an MCP-powered inline agent that checks warehouse stock and creates Dataverse tasks | 15 min |
 | EC | [Call a Price Quote Specialist Agent from a Workflow (Bonus)](#use-case-5-bonus-call-a-price-quote-specialist-agent-from-a-workflow) | Wire a published agent into a workflow branch to generate and send price quotes | 10 min (extra) |
 
@@ -467,7 +467,7 @@ Complete the setup of the **Order Management Workflow**: configure all solution 
 
 2. Open each node on the canvas by clicking on it so its connection can resolve. Start with the trigger: click **When a new email arrives** and, under **Connections**, wait for the connection to load — it should update automatically to your lab user. Most other nodes resolve the same way. Two nodes need a connection created manually:
 
-   - **M365 Copilot** node — open the node and, under **Connections**, select **Create new connection** > **Create**, then sign in with your lab account.
+   - **M365 Copilot** node — open the node and, under **Connections**, select **Create new connection** > **Create**, then sign in with your lab account. If this connection cannot be established because your lab account has no **Microsoft 365 Copilot** licence, carry on regardless — [Use Case #3](#use-case-3-replace-m365-copilot-with-an-agent-and-add-a-human-in-the-loop-in-order-management) deletes this node and replaces it with an Agent node.
    - **Human review** node — open the node and, under **Connections**, select **Create new connection** > **Create**, then sign in with your lab account.
 
 3. **Confirm you own the workflow.** In **Copilot Studio**, select **Workflows** in the left navigation and find **Order Management Workflow**. Check the **Owner** column.
@@ -582,19 +582,22 @@ You've completed the foundation that all subsequent use cases build on — the w
 
 ---
 
-## Use Case #3: Use M365 Copilot and Add a Human-in-the-Loop in Order Management
+## Use Case #3: Replace M365 Copilot with an Agent and Add a Human-in-the-Loop in Order Management
 
-Configure and validate the **Customer Inquiry** branch so the workflow drafts a response with **M365 Copilot**, pauses for a **Human review**, and only replies to the customer after approval.
+Rebuild the **Customer Inquiry** branch so an **Agent** node drafts the response instead of the licence-gated **M365 Copilot** node — then pause for a **Human review** and only reply to the customer after approval.
 
 **Summary of tasks**
 
-In this section, you'll inspect the Customer Inquiry routing branch, review how the M365 Copilot and Human review nodes are configured, publish any updates if needed, and run an end-to-end test with an approval email.
+In this section, you'll inspect the Customer Inquiry routing branch, read how the M365 Copilot node was configured, replace it with an Agent node carrying the same drafting prompt, repair the downstream Human review and Reply to email nodes, publish, and run an end-to-end test with an approval email.
 
-**Scenario:** A customer sends a product question to the order desk. Instead of crafting the answer manually every time, the workflow uses M365 Copilot to prepare a grounded draft response, sends that draft to a human reviewer for approval, and then either replies to the customer or flags the message for follow-up depending on the approver's decision.
+**Scenario:** A customer sends a product question to the order desk. Instead of crafting the answer manually every time, the workflow drafts a proposed response, sends that draft to a human reviewer for approval, and then either replies to the customer or flags the message for follow-up depending on the approver's decision.
+
+> [!IMPORTANT]
+> **The pre-built branch uses an M365 Copilot node, and that node needs a Microsoft 365 Copilot licence.** Lab accounts in this workshop do not have one, so the node cannot do its work. You will replace it with an **Agent** node, which runs on a Copilot Studio model you pick and needs no M365 Copilot licence. The drafting prompt moves across unchanged — only the node that executes it changes.
 
 ### Objective
 
-Validate the **Customer Inquiry** path of the **Order Management Workflow**: confirm the M365 Copilot draft prompt, inspect the Human review approval experience, test the path with a sample customer email, approve the proposed reply, and verify the customer response lands in your inbox.
+Swap the **M365 Copilot** node in the **Customer Inquiry** path of the **Order Management Workflow** for an **Agent** node, re-link the draft it produces into the **Human review** and **Reply to email** steps, test the path with a sample customer email, approve the proposed reply, and verify the customer response lands in your inbox.
 
 ---
 
@@ -604,83 +607,133 @@ Validate the **Customer Inquiry** path of the **Order Management Workflow**: con
 
 1. In **Copilot Studio**, open the published **Order Management Workflow** and select the **Classify** node. Observe the **Customer Inquiry** branch that leaves the classification node and note how it routes customer questions into a draft-and-review sequence.
 
-2. Select the **M365 Copilot** node in that branch. Review the prompt and confirm it uses the **Customer question** input based on the incoming email body. This is the grounded draft-generation step that prepares the proposed response for the reviewer. The prompt asks M365 Copilot to read the customer's question, search the existing email threads of the user that owns the node connection (you) for any prior context or earlier reply on the same topic, and then draft a complete, ready-to-send reply — answering clearly when it finds an answer, or writing a brief holding response when it can't (without inventing product facts), always addressed "Dear Customer," and signed off as "Contoso Electronics Order Management".
+2. Select the **M365 Copilot** node in that branch. Review the prompt and confirm it uses the **Customer question** input based on the incoming email body — this is the drafting step you are about to replace, and its wording is what you will carry over. The prompt asks M365 Copilot to read the customer's question, search the existing email threads of the user that owns the node connection (you) for any prior context or earlier reply on the same topic, and then draft a complete, ready-to-send reply — answering clearly when it finds an answer, or writing a brief holding response when it can't (without inventing product facts), always addressed "Dear Customer," and signed off as "Contoso Electronics Order Management".
 
    > [!NOTE]
-   > **M365 Copilot node scope:** The M365 Copilot node excels at addressing questions that leverage Microsoft Graph (emails, Teams chats, etc.) — think of it as prompts you would send in M365 Copilot chat. Note that the operations this node performs are **read-only** — it can search and retrieve information from emails, chats, and files, but it **cannot send emails or Teams messages**. If you need those write operations, use an **Agent** node with access to the relevant Work IQ tools instead.
-
-   > [!NOTE]
-   > **Fresh lab accounts have no history to ground on:** Because this lab uses a freshly provisioned account with no prior emails or Teams messages, the M365 Copilot node won't find real substance to build its answer from — so expect a generic holding reply. This step is illustrative: in a real mailbox with genuine history, M365 Copilot would ground the draft in actual prior threads and context.
+   > **M365 Copilot node scope:** The M365 Copilot node excels at addressing questions that leverage Microsoft Graph (emails, Teams chats, etc.) — think of it as prompts you would send in M365 Copilot chat. Note that the operations this node performs are **read-only** — it can search and retrieve information from emails, chats, and files, but it **cannot send emails or Teams messages**. If you need those write operations, use an **Agent** node with access to the relevant Work IQ tools instead. It also needs a **Microsoft 365 Copilot licence**, which is the reason this use case replaces it.
 
    ![The M365 Copilot node showing the Customer question input from the email body](images/customer-inquiry-m365-copilot-node.png)
 
 3. Select the **Human review** node and inspect its configuration carefully:
 
-   - In the message, confirm the proposed reply drafted by **M365 Copilot** is inserted for the reviewer to read.
+   - In the message, confirm the proposed reply drafted upstream is inserted for the reviewer to read. That token currently points at the **M365 Copilot** node — deleting the node breaks it, and you repair it in step 10.
    - Notice that the review request is delivered over **Outlook** — observe how we use an Outlook email to ask a person to approve before the workflow continues.
    - The reviewer responds through a single **Yes/No** input (**Send proposed reply from M365?**). Select **+** to expand and see the other input types available — text, email, number, date, and more. You don't need to add any here, but it's worth understanding the variety of formatted inputs you can request and then reuse cleanly in downstream nodes.
 
    ![The Human review node showing the proposed M365 reply and approval options](images/customer-inquiry-human-review-node.png)
 
-4. Select the **If/Else** node after Human review and observe the decision logic. When the reviewer answers **Yes**, the workflow sends the proposed reply to the customer; otherwise, the original email is flagged in the inbox for manual follow-up.
+4. Select the **If/Else** node after Human review and observe the decision logic. When the reviewer answers **Yes**, the workflow sends the proposed reply to the customer with a **Reply to email** action; otherwise, the original email is flagged in the inbox for manual follow-up. That reply action reads the same upstream draft, so it needs the same repair — step 11.
 
    ![The If Else node routing Yes to reply and No to inbox flagging](images/customer-inquiry-if-else-node.png)
 
-#### Run an end-to-end Customer Inquiry test
+#### Replace the M365 Copilot node with an Agent
 
-5. Open **Outlook** ([outlook.office.com](https://outlook.office.com)) and send the following email **to your lab user account**:
-
-   - **Subject:** `Order Management - Question about iPad Air warranty and MDM`
-   - **Body:**
-
-     ```
-     Hi team,
-
-     Quick question before we expand our last order. What is the standard warranty
-     period on the iPad Air (M2), and can the devices be enrolled in our mobile device
-     management (MDM)? I think we asked something similar a few months back but I can't
-     find the reply.
-
-     Thanks,
-     Jordan Kim
-     IT, Alpine Ski House
-     ```
-
-   ![The customer inquiry test email being composed in Outlook](images/customer-inquiry-test-email.png)
-
-6. Return to the workflow and open the **Activity** panel. Refresh until the new run appears, then open it and observe the path: **Classify → Customer Inquiry**.
-
-   > [!IMPORTANT]
-   > This path pauses at the approval step. If the run seems to stop, that is expected — the workflow is waiting for the **Human review** action to be completed from Outlook.
-
-   ![The Activity panel showing the run entering the Customer Inquiry path](images/customer-inquiry-activity-path.png)
-
-7. Wait until the run reaches the **Human Request** node. Once M365 Copilot finishes exploring your emails and drafting an appropriate response, a **green check** appears on the node and you should be notified of an incoming review email within a matter of seconds.
-
-   ![The run details showing the Human Request node waiting for approval](images/customer-inquiry-human-request-waiting.png)
-
-8. Go to **Outlook** and open the incoming approval email. It arrives from **Microsoft Power Automate** with the subject **"Action Needed: Review Customer Enquiry Reply"** and opens *"Dear reviewer, A customer inquiry has come in…"*. Review the proposed M365 Copilot reply, choose **Yes** under **Send proposed reply from M365?**, and select **Submit**.
-
-   > [!NOTE]
-   > The approval card is an **actionable message**, so Outlook renders the Yes/No choice and a **Submit** button inside the email itself — approving is two clicks (pick **Yes**, then **Submit**), not one. Outlook may also show a **Trust sender** prompt above the card; the card still works without actioning it.
+5. On the canvas, select the **+** directly under the **Customer Inquiry** branch — above the existing **M365 Copilot** node — and choose **Agent**. If prompted, **Create new connection** with your lab account. Leave the **Agent** dropdown on **New agent for this workflow**, so this branch gets its own inline agent rather than reusing a published one.
 
    > [!TIP]
-   > If you don't see the approval email, try **refreshing** Outlook. If it still doesn't land, go back to the workflow, open the **Build** tab, re-establish the connection on the **Human review** node by creating a new one, then select **Save** > **Publish** and run the test again.
+   > Add the agent **before** deleting the Copilot node. With both on the canvas you can copy the prompt straight across, and the downstream nodes have something to point at the moment you repair them.
 
-   ![The approval email in Outlook with the proposed reply and Yes button](images/customer-inquiry-approval-email.png)
+6. Copy the drafting prompt from the M365 Copilot node into the new agent's **Instructions**. It is reproduced below, with the email body left as a placeholder you replace in the next step:
 
-9. Return to your inbox and verify that the approved reply email lands there — it arrives with the subject **"Your inquiry - Contoso Electronics"** and opens *"Dear Customer,"*. This confirms the workflow resumed after human approval and sent the response automatically.
+   ```
+   A customer has sent the question below. Review our existing email threads for any prior context that answers it: A previous reply to this customer, or an earlier thread on the same topic.
+
+   Customer question: [email body]
+
+   Write a complete reply email addressed to the customer, in plain text, ready to send. Keep in mind:
+   - If existing threads answer the question, give the answer clearly and concisely.
+   - If you cannot find an answer, write a brief holding reply stating that we are looking into it and will follow up shortly. Do not invent product facts.
+   - Start with "Dear Customer," and end with "Kind regards, Contoso Electronics Order Management".
+   - Return only the email body, with no preamble or commentary.
+   ```
+
+7. Replace **`[email body]`** with dynamic content so the agent receives the real customer question at run time: select the placeholder, choose the **lightning** icon, search for **body**, and insert **Body** from **When a new email arrives**. When you are done, the instructions show a **Body** token on the *Customer question* line, not the literal text.
+
+   > [!IMPORTANT]
+   > **This is the one thing the copy/paste loses.** The M365 Copilot node had the email **Body** linked as its *Customer question* input; pasted text does not carry that link across. Without the token the agent drafts a reply to an empty question on every run — and it will still "succeed", so nothing tells you it went wrong. Confirm the token is there before moving on.
+
+8. Next to **Instructions**, open the model dropdown and choose **GPT-5.5 Chat**. Leave **Tools**, **Knowledge**, **Request human assistance**, and **Web search** as they are, and leave **Output** on **Text response** — both the Human review message and the Reply to email action consume the agent's plain-text response.
+
+   ![The Agent node configured with the drafting instructions, the Body token, and the GPT-5.5 Chat model](images/activity-inquiry-agent.png)
 
    > [!NOTE]
-   > Allow a couple of minutes after **Submit**. The workflow has to resume from the paused Human review node before it sends, so the reply does not appear instantly.
+   > **The Agent node has no mailbox access here.** With no tools attached it cannot actually search prior threads the way the M365 Copilot node could, so it falls back to the holding reply the prompt describes. On a freshly provisioned lab account that is the same outcome either way — there is no mail history to find. If you want a genuinely grounded draft, give the agent a **Mail** tool the way the Price Quote Agent does in [Use Case #5](#use-case-5-bonus-call-a-price-quote-specialist-agent-from-a-workflow).
 
-   ![The approved reply email received in the inbox](images/customer-inquiry-reply-received.png)
+9. Delete the **M365 Copilot** node: select it on the canvas and choose the **waste basket** icon in its header, then confirm.
+
+   > [!WARNING]
+   > Deleting the node invalidates every downstream reference to its output. The **Human review** and **Reply to email** nodes both used it, so expect them to show an error or an empty field until you fix them in the next two steps. **Re-typing the token is not enough — remove the stale reference and insert the new one.**
+
+10. Repair the **Human review** node. Open it, find the place in the message where the proposed reply was inserted, **delete the stale M365 Copilot token**, then choose the **lightning** icon, search for **response**, and insert the **response** output of the new **Agent** node. The reviewer's approval email now carries the agent's draft.
+
+11. Repair the **Reply to email** action the same way. Open it on the **Yes** branch of the If/Else, remove the stale token from the reply **Body**, then insert the **Agent** node's **response** in its place.
+
+    > [!TIP]
+    > Check both nodes before publishing. A missed token here is the most common cause of an approval email that arrives blank, or a customer reply that sends with no content.
+
+12. Select **Save**, then **Publish** so the rebuilt branch is live.
+
+#### Run an end-to-end Customer Inquiry test
+
+13. Open **Outlook** ([outlook.office.com](https://outlook.office.com)) and send the following email **to your lab user account**:
+
+    - **Subject:** `Order Management - Question about iPad Air warranty and MDM`
+    - **Body:**
+
+      ```
+      Hi team,
+
+      Quick question before we expand our last order. What is the standard warranty
+      period on the iPad Air (M2), and can the devices be enrolled in our mobile device
+      management (MDM)? I think we asked something similar a few months back but I can't
+      find the reply.
+
+      Thanks,
+      Jordan Kim
+      IT, Alpine Ski House
+      ```
+
+    ![The customer inquiry test email being composed in Outlook](images/customer-inquiry-test-email.png)
+
+14. Return to the workflow and open the **Activity** panel. Refresh until the new run appears, then open it and observe the path: **Classify → Customer Inquiry → Agent**.
+
+    > [!IMPORTANT]
+    > This path pauses at the approval step. If the run seems to stop, that is expected — the workflow is waiting for the **Human review** action to be completed from Outlook.
+
+    ![The Activity panel showing the run entering the Customer Inquiry path](images/customer-inquiry-activity-path.png)
+
+15. Wait until the run reaches the **Human Request** node. Once the agent finishes drafting the reply, a **green check** appears on the node and you should be notified of an incoming review email within a matter of seconds.
+
+    > [!TIP]
+    > Open the **Agent** node in the run details first. Its **response** is the exact text the reviewer is about to see — a quick way to confirm the **Body** token really reached the agent, because a run with a missing token drafts a reply to nothing rather than failing.
+
+    ![The run details showing the Human Request node waiting for approval](images/customer-inquiry-human-request-waiting.png)
+
+16. Go to **Outlook** and open the incoming approval email. It arrives from **Microsoft Power Automate** with the subject **"Action Needed: Review Customer Enquiry Reply"** and opens *"Dear reviewer, A customer inquiry has come in…"*. Review the proposed reply, choose **Yes** under **Send proposed reply from M365?** — the label the pre-built node ships with — and select **Submit**.
+
+    > [!NOTE]
+    > The approval card is an **actionable message**, so Outlook renders the Yes/No choice and a **Submit** button inside the email itself — approving is two clicks (pick **Yes**, then **Submit**), not one. Outlook may also show a **Trust sender** prompt above the card; the card still works without actioning it.
+
+    > [!TIP]
+    > If the card shows no proposed reply at all, the **Human review** message still carries a stale token — go back to step 10 and re-insert the Agent's **response**.
+
+    > [!TIP]
+    > If you don't see the approval email, try **refreshing** Outlook. If it still doesn't land, go back to the workflow, open the **Build** tab, re-establish the connection on the **Human review** node by creating a new one, then select **Save** > **Publish** and run the test again.
+
+    ![The approval email in Outlook with the proposed reply and Yes button](images/customer-inquiry-approval-email.png)
+
+17. Return to your inbox and verify that the approved reply email lands there — it arrives with the subject **"Your inquiry - Contoso Electronics"** and opens *"Dear Customer,"*. This confirms the workflow resumed after human approval and sent the response automatically.
+
+    > [!NOTE]
+    > Allow a couple of minutes after **Submit**. The workflow has to resume from the paused Human review node before it sends, so the reply does not appear instantly.
+
+    ![The approved reply email received in the inbox](images/customer-inquiry-reply-received.png)
 
 ---
 
 ### Congratulations! The Customer Inquiry path is now drafting, reviewing, and replying successfully.
 
-You've confirmed that the workflow can generate a grounded response with M365 Copilot, pause for human approval, and then continue automatically based on the reviewer's decision.
+You've replaced a licence-gated M365 Copilot node with an inline Agent node that runs the same drafting prompt, re-wired the nodes that depended on its output, paused for human approval, and let the workflow continue automatically based on the reviewer's decision.
 
 ---
 
@@ -711,10 +764,10 @@ Build and validate the **Supplier Delay** path of the **Order Management Workflo
 
    ![The Supplier Delay category with the add action menu open to Agent](images/supplier-delay-add-agent.png)
 
-2. In the new node, leave **Agent** set to **New agent in this workflow**. This creates an inline agent dedicated to this workflow path. Keep the default AI model.
+2. In the new node, leave **Agent** set to **New agent in this workflow**. This creates an inline agent dedicated to this workflow path. Then open the model dropdown next to **Instructions** and select **Sonnet 5** instead of keeping the default model — this branch does the most reasoning in the workflow, and it is worth giving it a stronger model.
 
    > [!TIP]
-   > A strength of AI-native nodes in Workflows is that you can choose a **different model per node**. An example is an inline agent that runs on a **Claude** model for its reasoning, while the **Classify** node uses a lighter **GPT** model — a cost-optimization pattern. Matching the model to the work each node does keeps the workflow both capable and economical.
+   > A strength of AI-native nodes in Workflows is that you can choose a **different model per node** — which is exactly what you just did. This workflow now runs an inline agent on a **Claude** model for its multi-step reasoning, while the **Classify** node uses a lighter **GPT** model and the Customer Inquiry agent from Use Case #3 runs on **GPT-5.5 Chat** — a cost-optimization pattern. Matching the model to the work each node does keeps the workflow both capable and economical.
 
 3. Select **Expand** (the two arrows next to **...**) so you can edit the full agent configuration, then rename the node title from **Agent** to **Inventory Task Agent**.
 
@@ -998,7 +1051,8 @@ To get the most out of Workflows in Copilot Studio:
 * **Solution-level setup matters** — connection references in the Power Apps solution must be linked to actual connections *before* the workflow can be activated. Canvas-level connections alone are not sufficient; always verify solution connection references.
 * **Classify with examples, refine with testing** — the Classify node's accuracy depends on the quality and diversity of category examples. Test with edge cases and refine descriptions iteratively to improve routing accuracy.
 * **Ownership is a prerequisite** — workflows created by another user require an ownership transfer before you can publish or manage them. Use the Dataverse **Assign** function to take control.
-* **Use M365 Copilot when you need grounded, read-only retrieval** — the M365 Copilot node is excellent for finding context in email, chats, and files, but it does not perform write actions such as sending mail. Pair it with downstream workflow actions when approval or dispatch is required.
+* **Know what each AI node costs you in licensing** — the M365 Copilot node is excellent for finding grounded context in email, chats, and files, but it needs a Microsoft 365 Copilot licence and performs no write actions such as sending mail. An **Agent** node runs the same prompt without that licence; it simply needs tools of its own to reach back into Microsoft 365 data.
+* **Swapping a node means re-wiring everything downstream** — a prompt copies across verbatim, but its dynamic inputs (the email **Body**) and every downstream reference to its output (Human review, Reply to email) are bound to the node you deleted. Re-insert each one, and re-publish.
 * **Human review is the safety valve for customer-facing automation** — approval nodes let you insert AI-generated content into a reviewer-friendly message, capture a clear Yes/No decision, and keep the workflow paused until a person signs off.
 * **MCP servers turn an agent into an operational worker** — by connecting the Agent node to tools like Warehouse MCP and Dataverse MCP, the workflow can retrieve live business data, make judgments, and write records into line-of-business systems.
 * **Structured output makes agent reasoning reusable** — typed fields like `sku`, `stock`, and `risk` make it easier to inspect runs, pass results downstream, and design automations that combine non-deterministic reasoning with deterministic follow-up.
@@ -1018,7 +1072,7 @@ To get the most out of Workflows in Copilot Studio:
 * **Fix connection references at the solution level** — creating connections in the canvas is not enough. Always verify and link connection references in the Power Apps solution before publishing.
 * **Transfer ownership early** — if a workflow was created by another user, take ownership via Dataverse **Assign** before attempting any other management operations.
 * **Classify nodes are only as good as their examples** — invest time in adding diverse, representative examples to each category and testing edge cases to improve classification accuracy.
-* Use the **M365 Copilot** node for grounded, **read-only** retrieval and drafting, then pair it with other nodes when the workflow needs to send messages or update systems.
+* Use the **M365 Copilot** node for grounded, **read-only** retrieval and drafting **where the licence exists**, and reach for an **Agent** node where it does not — then re-link every dynamic input and every downstream reference to the replaced node's output.
 * Put **Human review** in front of customer-facing actions whenever the quality bar or business risk warrants a person-in-the-loop checkpoint.
 * Use **MCP-connected agents** when the workflow needs to reason over live enterprise data and write operational outcomes such as Dataverse tasks.
 * Prefer **structured output** from agents when downstream steps, monitoring, or reporting depend on predictable fields rather than free-form text.

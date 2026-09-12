@@ -160,7 +160,7 @@ Create and configure a Fabric Data Agent that can intelligently query the e-comm
    - E-commerce Lakehouse
    - SQL Endpoint
 
-4. Open the **E-commerce Dataset Report** to familiarize yourself with the data structure and available metrics. Keep this tab open for reference.
+4. Open the **E-commerce Order Dataset** semantic model to familiarize yourself with the data structure and available metrics. Keep this tab open for reference.
 
 5. Duplicate the browser tab and navigate back to **Workshop Demo Workspace**.
 
@@ -203,6 +203,7 @@ Create and configure a Fabric Data Agent that can intelligently query the e-comm
 
 5. After validation completes, select all available tables:
 
+    - Category
     - Customers
     - Order_Items
     - Orders
@@ -365,7 +366,7 @@ In this section, you'll learn how to create a Copilot Studio agent, establish co
 
 2. **Optional** If the environment in the top right corner in anything else than "ddev-[your username]" make sure to select the right "ddev-[your username]".
 
-3. In the left navigation, locate **Agents** and click the blue **New agent** button.
+3. In the left navigation, locate **Agents**. Click the dropdown arrow next to the blue **New agent** button, then under **Build using standard orchestration**, select **Agent** (labeled **Standard**).
 
 4. Skip the describe functionality and select **Configure**.
 

@@ -153,17 +153,13 @@ Create an autonomous agent that automatically triggers when new support emails a
 
 1. Navigate to the Copilot Studio home page at https://copilotstudio.microsoft.com/
 
-2. Go to the **Solutions** menu (located in the left-hand menu under the ellipsis `...`)
+2. In the left navigation, locate **Agents**. Click the dropdown arrow next to the blue **New agent** button, then under **Build using standard orchestration**, select **Agent** (labeled **Standard**).
 
-3. Select the solution you had created previously for your labs
+3. Skip the describe functionality and select **Configure**.
 
-4. Select **New** and choose **Agent**
+4. Name your agent `Autonomous Support Agent`
 
-5. Select **Skip to configure** to bypass the initial setup wizard
-
-6. Name your agent `Autonomous Support Agent`
-
-7. Select **Create**.
+5. Select **Create**.
 
 > [!NOTE]
 > Choose a descriptive name that clearly identifies the agent's purpose for easier management in larger environments.
@@ -172,22 +168,29 @@ Create an autonomous agent that automatically triggers when new support emails a
 
 8. In the **Overview** tab, scroll down to the triggers section and click **Add a new Trigger**
 
-9. Search and select `When a new email arrives (V3)` (**Office 365 Outlook**)
+9. Select **Turn it on** to enable generative orchestration when prompted
 
-10. Select **Next**, then **Continue**
+   ![Turn on generative orchestration prompt in the Add trigger panel](images/turn-on-generative-orchestration.png)
 
-10. Rename the trigger to `When a support email arrives`
+    > [!TIP]
+    > Generative orchestration gives your agent more flexibility in how it responds and is required to add triggers. This is a billable feature and will consume messages.
 
-11. Select **Next**, 
+10. Search and select `When a new email arrives (V3)` (**Office 365 Outlook**)
 
-12. In the **Subject Filter (Optional)** field, enter `Support` to filter emails that contain the word "Support" in the subject line.
+11. Select **Next**, then **Continue**
 
-13. Finally **Create trigger**
+12. Rename the trigger to `When a support email arrives`
+
+13. Select **Next**, 
+
+14. In the **Subject Filter (Optional)** field, enter `Support` to filter emails that contain the word "Support" in the subject line.
+
+15. Finally **Create trigger**
 
     > [!TIP]
     > This trigger configuration determines which emails activate your agent. You can refine filters later to target specific email addresses or subject patterns.
 
-14. The trigger is now configured. After you **publish** your agent, it will automatically activate your agent when new emails arrive
+16. The trigger is now configured. After you **publish** your agent, it will automatically activate your agent when new emails arrive
 
 ---
 
@@ -347,11 +350,10 @@ In this section, you'll learn how to integrate knowledge sources, configure Serv
 
 #### Testing Your Complete Agent
 
-30. **Send** a test email to your training user email by using the **Workshop Agent**. Ask it to `Send a support email`. You will then shortly receive the email in **Microsoft Outlook**.
+30. **Send** a test email to your training user email using the **Request Support Email** form, linked in the **Lab Resources** table under the **Autonomous Support Agent** row (specific per training).
 
     > [!IMPORTANT]
-    > - Access the workshop agent in the same location as when you created your training user account.
-    > - You will need the workshop code and your training user's email address if you previously closed the agent.
+    > - You will need your training user's email address.
     > - You can repeat this process as desired.
 
     >
