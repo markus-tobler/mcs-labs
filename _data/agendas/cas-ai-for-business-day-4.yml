@@ -1,0 +1,98 @@
+event_id: cas-ai-for-business-day-4
+
+# CAS AI for Business — Day 4 of 5 (day 6 is an untracked hackathon day).
+# Source: _events/CAS_GenAI_2026_Tagesstruktur_V2.xlsx ("Übersicht" + "Tag 4").
+#
+# Conventions:
+#   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
+#   * Lab labels follow the course numbering: 01-13 for the main track and
+#     C01/C04/C06 for the custom labs authored for this course.
+#   * Didactic principle (flipped classroom at lab level): each lab opens with
+#     a short instructor intro, participants then work through the lab, and a
+#     theory block follows to consolidate what they just built.
+#   * Lab 07 (workflows) continues today as 07c/07d, split across the lunch
+#     break; 07a/07b (multi-agent, orchestration) ran on Day 3.
+
+schedule:
+  - type: session
+    title: "Recap Block 1, open questions, status of hackathon use cases"
+    time: "08:30"
+    duration: 30
+
+  - type: session
+    title: "Hackathon prep 4: Firm up your architecture and share your use case"
+    time: "09:00"
+    duration: 40
+
+  - type: session
+    title: "Group work: Human-in-the-loop"
+    time: "09:40"
+    duration: 20
+
+  - type: lab
+    slug: autonomous-support-agent
+    label: "Lab 11"
+    title: "Autonomous Support Agent"
+    time: "10:00"
+    duration: 30
+
+  - type: break
+    title: "Coffee break"
+    time: "10:30"
+    duration: 15
+
+  - type: session
+    title: "Theory: Autonomous agents & human-in-the-loop patterns — approvals, when do you need a human in the loop?"
+    time: "10:45"
+    duration: 30
+
+  - type: lab
+    slug: mcs-workflows
+    label: "Lab 07c"
+    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation (Part 1)"
+    time: "11:15"
+    duration: 30
+
+  - type: break
+    title: "Lunch break"
+    time: "11:45"
+    duration: 60
+
+  - type: lab
+    slug: mcs-workflows
+    label: "Lab 07d"
+    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation (Part 2)"
+    time: "12:45"
+    duration: 30
+
+  - type: session
+    title: "Theory: Skills for automating business processes"
+    time: "13:15"
+    duration: 30
+
+  - type: session
+    title: "Group work: Build a skill"
+    time: "13:45"
+    duration: 20
+
+  - type: lab
+    slug: skill-creation-agent
+    label: "Lab 13"
+    title: "Skill Creation Agent"
+    time: "14:05"
+    duration: 45
+
+  - type: break
+    title: "Coffee break"
+    time: "14:50"
+    duration: 15
+
+  - type: session
+    title: "Case studies: VT, H+S, HR agent"
+    time: "15:05"
+    duration: 15
+
+  - type: session
+    title: "Day 4 wrap-up"
+    time: "15:20"
+    duration: 15
