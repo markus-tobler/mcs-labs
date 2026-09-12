@@ -6,7 +6,7 @@ event_id: cas-ai-for-business-day-5
 # Conventions:
 #   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
 #   * Lab labels follow the course numbering: 01-13 for the main track and
-#     C01/C04/C06 for the custom labs authored for this course.
+#     C01/C06 for the custom labs authored for this course.
 #   * Didactic principle (flipped classroom at lab level): each lab opens with
 #     a short instructor intro, participants then work through the lab, and a
 #     theory block follows to consolidate what they just built.
@@ -75,13 +75,12 @@ schedule:
 
   - type: lab
     slug: data-fabric-agent
-    label: "Lab C04"
     title: "Connecting Fabric Data Agents with Microsoft Copilot Studio"
     time: "12:50"
     duration: 40
 
   - type: session
-    title: "Work on your own hackathon use case, Phase 2 (with instructor coaching)"
+    title: "Work on your own hackathon use case (instructor support) or finish open labs"
     time: "13:30"
     duration: 30
 
@@ -91,7 +90,7 @@ schedule:
     duration: 15
 
   - type: session
-    title: "Work on your own hackathon use case, Phase 3 (presentation prep)"
+    title: "Work on your own hackathon use case (instructor support) or finish open labs"
     time: "14:15"
     duration: 30
 
