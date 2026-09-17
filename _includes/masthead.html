@@ -36,6 +36,7 @@
             </li>
           {%- endfor -%}
         </ul>
+        {% if site.lab_assistant != false %}
         <button
           type="button"
           class="wc-account-cta wc-account-cta--masthead"
@@ -50,6 +51,7 @@
           </svg>
           <span>Request account</span>
         </button>
+        {% endif %}
         {% include a11y/settings-menu.html %}
         {% if site.search == true %}
         <button class="search__toggle" type="button">

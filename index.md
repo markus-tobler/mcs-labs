@@ -208,6 +208,7 @@ header:
   <div class="home-hero-actions">
     <a href="{{ '/events/' | relative_url }}" class="btn-primary">Browse events</a>
     <a href="{{ '/modules/' | relative_url }}" class="btn-outline">Browse all modules</a>
+    {% if site.lab_assistant != false %}
     <button type="button" class="wc-account-cta wc-account-cta--hero" data-wc-account-cta>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -217,6 +218,7 @@ header:
       </svg>
       Request an account
     </button>
+    {% endif %}
   </div>
   <ul class="home-stats">
     <li><strong>{{ all_modules.size }}</strong><span>Modules</span></li>

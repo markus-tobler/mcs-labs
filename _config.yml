@@ -23,6 +23,12 @@ breadcrumbs: true
 # Code copy button
 enable_copy_code_button: true
 
+# Lab Assistant (WebChat). Set to false to switch the whole feature off: the
+# side tag, the "Request account" masthead button, the hero button on the home
+# page, and the Direct Line token request. Override per build in
+# _config.local.yml to review the site without it.
+lab_assistant: false
+
 
 # Build settings
 markdown: kramdown
