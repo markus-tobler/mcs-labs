@@ -30,7 +30,7 @@
 
 <!-- WebChat side panel (suppressed on the issue tracker — that page is a status dashboard, not a help context) -->
 {% unless page.url contains '/tracker/' %}
-{% if site.data.webchat.tokenEndpoint %}
+{% if site.lab_assistant != false and site.data.webchat.tokenEndpoint %}
 {% include webchat/styles.html %}
 {% include webchat/panel.html %}
 {% include webchat/script.html %}
