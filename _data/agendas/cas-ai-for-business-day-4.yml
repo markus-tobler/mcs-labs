@@ -10,8 +10,8 @@ event_id: cas-ai-for-business-day-4
 #   * Didactic principle (flipped classroom at lab level): each lab opens with
 #     a short instructor intro, participants then work through the lab, and a
 #     theory block follows to consolidate what they just built.
-#   * Lab 07 (workflows) continues today as 07c/07d, split across the lunch
-#     break; 07a/07b (multi-agent, orchestration) ran on Day 3.
+#   * Lab 07 (workflows) continues today as 07c, a single 60-minute block after
+#     lunch; 07a/07b (multi-agent, orchestration) ran on Day 3.
 
 schedule:
   - type: session
@@ -46,10 +46,8 @@ schedule:
     time: "10:45"
     duration: 30
 
-  - type: lab
-    slug: mcs-workflows
-    label: "Lab 07c"
-    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation (Part 1)"
+  - type: session
+    title: "Theory: Harness and orchestrator"
     time: "11:15"
     duration: 30
 
@@ -60,39 +58,39 @@ schedule:
 
   - type: lab
     slug: mcs-workflows
-    label: "Lab 07d"
-    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation (Part 2)"
+    label: "Lab 07c"
+    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation"
     time: "12:45"
-    duration: 30
+    duration: 60
 
   - type: session
     title: "Theory: Skills for automating business processes"
-    time: "13:15"
+    time: "13:45"
     duration: 30
+
+  - type: break
+    title: "Coffee break"
+    time: "14:15"
+    duration: 15
 
   - type: session
     title: "Group work: Build a skill"
-    time: "13:45"
+    time: "14:30"
     duration: 20
+
+  - type: session
+    title: "Skills resources"
+    time: "14:50"
+    duration: 10
 
   - type: lab
     slug: skill-creation-agent
     label: "Lab 13"
     title: "Skill Creation Agent"
-    time: "14:05"
-    duration: 45
-
-  - type: break
-    title: "Coffee break"
-    time: "14:50"
-    duration: 15
-
-  - type: session
-    title: "Case studies: VT, H+S, HR agent"
-    time: "15:05"
-    duration: 15
+    time: "15:00"
+    duration: 30
 
   - type: session
     title: "Day 4 wrap-up"
-    time: "15:20"
+    time: "15:30"
     duration: 15
