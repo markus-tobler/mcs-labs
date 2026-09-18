@@ -6,12 +6,14 @@ event_id: cas-ai-for-business-day-5
 # Conventions:
 #   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
 #   * Lab labels follow the course numbering: 01-13 for the main track and
-#     C01/C06 for the custom labs authored for this course.
+#     C01/C04/C06 for the custom labs authored for this course.
 #   * Didactic principle (flipped classroom at lab level): each lab opens with
 #     a short instructor intro, participants then work through the lab, and a
 #     theory block follows to consolidate what they just built.
-#   * Lab 09 (Expense Claims, human-in-the-loop) is split into two chunks
-#     across the coffee break.
+#   * The skills track (theory, group work, resources, Lab 13) opens the day;
+#     it moved here from Day 4.
+#   * Lab 09 (Expense Claims, human-in-the-loop) runs as a single 60-minute
+#     block before lunch.
 #   * Day 6 (not carried as its own event) is a full hackathon day:
 #     participants implement their own use case and close with final
 #     presentations.
@@ -22,84 +24,90 @@ schedule:
     time: "08:30"
     duration: 15
 
+  - type: session
+    title: "Theory: Skills for automating business processes"
+    time: "08:45"
+    duration: 30
+
+  - type: session
+    title: "Group work: Build a skill"
+    time: "09:15"
+    duration: 20
+
+  - type: session
+    title: "Skills resources"
+    time: "09:35"
+    duration: 10
+
+  - type: lab
+    slug: skill-creation-agent
+    label: "Lab 13"
+    title: "Skill Creation Agent"
+    time: "09:45"
+    duration: 30
+
+  - type: break
+    title: "Coffee break"
+    time: "10:15"
+    duration: 15
+
   - type: lab
     slug: autonomous-cua
     label: "Lab 12"
     title: "Autonomous CUA Agent"
-    time: "08:45"
+    time: "10:30"
     duration: 40
 
   - type: session
     title: "Case studies: VT, H+S, HR agent"
-    time: "09:25"
+    time: "11:10"
     duration: 15
 
   - type: lab
     slug: human-in-the-loop-modern
-    label: "Lab 09a"
-    title: "Expense Claims with Approvals — Human-in-the-Loop (Part 1)"
-    time: "09:40"
-    duration: 30
+    label: "Lab 09"
+    title: "Expense Claims with Approvals — Human-in-the-Loop"
+    time: "11:25"
+    duration: 60
 
   - type: break
-    title: "Coffee break"
-    time: "10:10"
-    duration: 15
-
-  - type: lab
-    slug: human-in-the-loop-modern
-    label: "Lab 09b"
-    title: "Expense Claims with Approvals — Human-in-the-Loop (Part 2)"
-    time: "10:25"
-    duration: 30
+    title: "Lunch break"
+    time: "12:25"
+    duration: 45
 
   - type: session
     title: "Mini theory: Agent security"
-    time: "10:55"
+    time: "13:10"
     duration: 15
 
   - type: session
     title: "Theory: Choosing a model in practice — cost, latency, data protection (demo in Azure AI Foundry)"
-    time: "11:10"
+    time: "13:25"
     duration: 25
-
-  - type: break
-    title: "Lunch break"
-    time: "11:35"
-    duration: 60
 
   - type: session
     title: "Theory: Access to structured data"
-    time: "12:35"
+    time: "13:50"
     duration: 15
 
   - type: lab
     slug: data-fabric-agent
-    title: "Connecting Fabric Data Agents with Microsoft Copilot Studio"
-    time: "12:50"
+    label: "Lab C04"
+    title: "Data Agent — Connecting Fabric Data Agents with Microsoft Copilot Studio"
+    time: "14:05"
     duration: 40
-
-  - type: session
-    title: "Work on your own hackathon use case (instructor support) or finish open labs"
-    time: "13:30"
-    duration: 30
 
   - type: break
     title: "Coffee break"
-    time: "14:00"
+    time: "14:45"
     duration: 15
 
   - type: session
     title: "Work on your own hackathon use case (instructor support) or finish open labs"
-    time: "14:15"
-    duration: 30
-
-  - type: session
-    title: "Stand-up: who's where, what's still missing"
-    time: "14:45"
+    time: "15:00"
     duration: 30
 
   - type: session
     title: "Day 5 wrap-up, Day 6 briefing"
-    time: "15:15"
+    time: "15:30"
     duration: 15

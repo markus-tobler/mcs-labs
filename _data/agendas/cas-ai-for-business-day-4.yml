@@ -10,8 +10,10 @@ event_id: cas-ai-for-business-day-4
 #   * Didactic principle (flipped classroom at lab level): each lab opens with
 #     a short instructor intro, participants then work through the lab, and a
 #     theory block follows to consolidate what they just built.
-#   * Lab 07 (workflows) continues today as 07c, a single 60-minute block after
-#     lunch; 07a/07b (multi-agent, orchestration) ran on Day 3.
+#   * Lab 07 (workflows) continues today as 07c, split into two 60-minute
+#     chunks across the afternoon coffee break; 07a/07b (multi-agent,
+#     orchestration) ran on Day 3.
+#   * The skills track (theory, group work, resources, Lab 13) moved to Day 5.
 
 schedule:
   - type: session
@@ -24,73 +26,58 @@ schedule:
     time: "09:00"
     duration: 40
 
+  - type: break
+    title: "Coffee break"
+    time: "09:40"
+    duration: 15
+
   - type: session
     title: "Group work: Human-in-the-loop"
-    time: "09:40"
-    duration: 20
+    time: "09:55"
+    duration: 10
 
   - type: lab
     slug: autonomous-support-agent
     label: "Lab 11"
     title: "Autonomous Support Agent"
-    time: "10:00"
+    time: "10:05"
     duration: 30
-
-  - type: break
-    title: "Coffee break"
-    time: "10:30"
-    duration: 15
 
   - type: session
     title: "Theory: Autonomous agents & human-in-the-loop patterns — approvals, when do you need a human in the loop?"
-    time: "10:45"
+    time: "10:35"
     duration: 30
 
   - type: session
     title: "Theory: Harness and orchestrator"
-    time: "11:15"
+    time: "11:05"
     duration: 30
 
   - type: break
     title: "Lunch break"
-    time: "11:45"
+    time: "11:35"
     duration: 60
 
   - type: lab
     slug: mcs-workflows
     label: "Lab 07c"
-    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation"
-    time: "12:45"
+    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation (Part 1)"
+    time: "12:35"
     duration: 60
-
-  - type: session
-    title: "Theory: Skills for automating business processes"
-    time: "13:45"
-    duration: 30
 
   - type: break
     title: "Coffee break"
-    time: "14:15"
+    time: "13:35"
     duration: 15
 
-  - type: session
-    title: "Group work: Build a skill"
-    time: "14:30"
-    duration: 20
-
-  - type: session
-    title: "Skills resources"
-    time: "14:50"
-    duration: 10
-
   - type: lab
-    slug: skill-creation-agent
-    label: "Lab 13"
-    title: "Skill Creation Agent"
-    time: "15:00"
-    duration: 30
+    slug: mcs-workflows
+    label: "Lab 07c"
+    title: "Workflows — Trigger, Human-in-the-Loop, Agent Automation (Part 2)"
+    time: "13:50"
+    duration: 60
 
   - type: session
     title: "Day 4 wrap-up"
-    time: "15:30"
+    time: "14:50"
     duration: 15
