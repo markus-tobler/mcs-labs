@@ -39,17 +39,17 @@ schedule:
     time: "09:35"
     duration: 10
 
+  - type: break
+    title: "Coffee break"
+    time: "09:45"
+    duration: 15
+
   - type: lab
     slug: skill-creation-agent
     label: "Lab 13"
     title: "Skill Creation Agent"
-    time: "09:45"
+    time: "10:00"
     duration: 30
-
-  - type: break
-    title: "Coffee break"
-    time: "10:15"
-    duration: 15
 
   - type: lab
     slug: autonomous-cua
