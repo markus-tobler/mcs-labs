@@ -12,8 +12,6 @@ event_id: cas-ai-for-business-day-5
 #     theory block follows to consolidate what they just built.
 #   * The skills track (theory, group work, resources, Lab 13) opens the day;
 #     it moved here from Day 4.
-#   * Lab 09 (Expense Claims, human-in-the-loop) runs as a single 60-minute
-#     block before lunch.
 #   * Day 6 (not carried as its own event) is a full hackathon day:
 #     participants implement their own use case and close with final
 #     presentations.
@@ -27,87 +25,80 @@ schedule:
   - type: session
     title: "Theory: Skills for automating business processes"
     time: "08:45"
-    duration: 30
+    duration: 45
 
   - type: session
     title: "Group work: Build a skill"
-    time: "09:15"
+    time: "09:30"
     duration: 20
 
   - type: session
     title: "Skills resources"
-    time: "09:35"
+    time: "09:50"
     duration: 10
 
   - type: break
     title: "Coffee break"
-    time: "09:45"
+    time: "10:00"
     duration: 15
 
   - type: lab
     slug: skill-creation-agent
     label: "Lab 13"
     title: "Skill Creation Agent"
-    time: "10:00"
-    duration: 30
+    time: "10:15"
+    duration: 45
 
   - type: lab
     slug: autonomous-cua
     label: "Lab 12"
     title: "Autonomous CUA Agent"
-    time: "10:30"
-    duration: 40
-
-  - type: session
-    title: "Case studies: VT, H+S, HR agent"
-    time: "11:10"
-    duration: 15
-
-  - type: lab
-    slug: human-in-the-loop-modern
-    label: "Lab 09"
-    title: "Expense Claims with Approvals — Human-in-the-Loop"
-    time: "11:25"
-    duration: 60
+    time: "11:00"
+    duration: 45
 
   - type: break
     title: "Lunch break"
-    time: "12:25"
+    time: "11:45"
     duration: 45
 
   - type: session
-    title: "Mini theory: Agent security"
-    time: "13:10"
+    title: "Case studies: VT, H+S, HR agent"
+    time: "12:30"
     duration: 15
 
   - type: session
-    title: "Theory: Choosing a model in practice — cost, latency, data protection (demo in Azure AI Foundry)"
-    time: "13:25"
-    duration: 25
-
-  - type: session
     title: "Theory: Access to structured data"
-    time: "13:50"
+    time: "12:45"
     duration: 15
 
   - type: lab
     slug: data-fabric-agent
     label: "Lab C04"
     title: "Data Agent — Connecting Fabric Data Agents with Microsoft Copilot Studio"
-    time: "14:05"
+    time: "13:00"
     duration: 40
+
+  - type: session
+    title: "Mini theory: Agent security"
+    time: "13:40"
+    duration: 15
+
+  - type: session
+    title: "Theory: Choosing a model in practice — cost, latency, data protection (demo in Azure AI Foundry)"
+    time: "13:55"
+    duration: 25
 
   - type: break
     title: "Coffee break"
-    time: "14:45"
+    time: "14:20"
     duration: 15
 
   - type: session
     title: "Work on your own hackathon use case (instructor support) or finish open labs"
-    time: "15:00"
+    time: "14:35"
     duration: 30
 
   - type: session
     title: "Day 5 wrap-up, Day 6 briefing"
-    time: "15:30"
+    time: "15:05"
     duration: 15
