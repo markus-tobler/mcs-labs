@@ -1,0 +1,62 @@
+event_id: cas-ai-for-business-day-6
+
+# CAS AI for Business — Day 6 of 6.
+# Source: _events/CAS_GenAI_2026_Tagesstruktur_V2.xlsx ("Übersicht" + "Tag 6").
+#
+# Conventions:
+#   * "lab" rows reference _labs/<slug>.md. `duration:` overrides the lab's own.
+#   * Lab labels follow the course numbering: 01-13 for the main track and
+#     C01/C04/C06/C07 for the custom labs authored for this course.
+#   * No theory blocks on this day: participants implement the use case they
+#     scoped during the week and close with final presentations.
+#   * Lab C07 (Save Your Work) sits deliberately at the end of the course —
+#     the lab environment is torn down afterwards, so this is the last chance
+#     to export the agents and workflows built over the six days.
+
+schedule:
+  - type: session
+    title: "Start, open questions"
+    time: "08:30"
+    duration: 15
+
+  - type: session
+    title: "Hackathon: Implement your own use case"
+    time: "08:45"
+    duration: 75
+
+  - type: break
+    title: "Coffee break"
+    time: "10:00"
+    duration: 15
+
+  - type: session
+    title: "Hackathon: Implement your own use case (continued)"
+    time: "10:15"
+    duration: 90
+
+  - type: break
+    title: "Lunch break"
+    time: "11:45"
+    duration: 60
+
+  - type: session
+    title: "Final touches, get presentation ready"
+    time: "12:45"
+    duration: 30
+
+  - type: lab
+    slug: save-your-work
+    label: "Lab C07"
+    title: "Save Your Work — Export Your Agents and Workflows"
+    time: "13:15"
+    duration: 15
+
+  - type: session
+    title: "Final presentations"
+    time: "13:30"
+    duration: 90
+
+  - type: session
+    title: "Wrap-up"
+    time: "15:00"
+    duration: 15
