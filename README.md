@@ -36,6 +36,7 @@
 | MCP Qualify Lead | [mcp-qualify-lead](./labs/mcp-qualify-lead) | Connect to Dynamics 365 Sales with Model Context Protocol to identify and prioritize high-value leads, enabling sellers to focus their time and effort where it counts most. |
 | Build and Connect Your Guild's Custom MCP Server | [guildhall-custom-mcp](./labs/guildhall-custom-mcp) | Deploy a custom Model Context Protocol (MCP) server locally and connect it to a Copilot Studio agent that can query quests, hire parties, and manage the Guild treasury on your behalf. |
 | Dataverse MCP Connector | [dataverse-mcp-connector](./labs/dataverse-mcp-connector) | Create and configure a Copilot Agent with Dataverse MCP Server integration to read and update account information from Dataverse using natural language queries. |
+| Save Your Work - Export Your Agents and Workflows | [save-your-work](./labs/save-your-work) | Package everything you built in a temporary lab environment into a Power Platform solution and export it as an unmanaged package, so your work leaves the workshop with you. |
 | Model Context Protocol (MCP) & Copilot Studio | [MCS-MCP Lab](https://github.com/microsoft/mcsmcp) | Learn how to deploy an MCP Server and integrate it with Microsoft Copilot Studio for streamlined deployment and management. |
 
 ## 📚 Documentation & Contributing
